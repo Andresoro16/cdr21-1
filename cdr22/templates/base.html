@@ -6,10 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/base.css'%}">
+    {% block estilos %}
+    {% endblock %}
     <title>{% block titulo %}{% endblock %}</title>
 </head>
 <body>
-    {% block contenido %}{% endblock %}
+    <header>
+        testing header
+    </header>
+    {% block contenido %}
+    {% endblock %}
+    <footer>
+        <a href=""></a>
+    </footer>
 </body>
 </html>
 

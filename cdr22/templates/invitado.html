@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/invitado.css'%}">
+    {% block estilos %}{% endblock %}
+    <title>{% block titulo %}{% endblock %}</title>
+</head>
+<body >
+    <main class="contenedor-principal">
+        <!-- Imagen principal -->
+        <div>
+            <img width="500" src="{% static '/img/invitado-img.png' %}" alt="">
+        </div>
+        <!-- Formularios -->
+        <div>
+            {% block contenido %}
+            {% endblock %}
+        </div>
+    </main>
+
+</body>
+</html>
+

@@ -1,0 +1,21 @@
+{% extends 'invitado.html' %}
+
+{% block contenido %}
+<form class="formulario" action="">
+    <div class="formulario_campo">
+        <label class="formulario_label" for="correo">
+            Correo
+        </label>
+        <input class="formulario_input" type="text" id="correo" placeholder="sergio@hotmail.com">
+    </div>
+    <div class="formulario_campo">
+        <label class="formulario_label" for="password">
+            Contraseña
+        </label>
+        <input class="formulario_input" type="password" id="password" placeholder="********">
+    </div>
+    <div>
+        <button class="formulario_boton formulario_boton_verde" type="submit">Inicio de sesión</button>
+    </div>
+</form>
+{% endblock contenido %}
