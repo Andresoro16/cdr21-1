@@ -7,16 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/invitado.css'%}">
     {% block estilos %}{% endblock %}
-    <title>{% block titulo %}{% endblock %}</title>
+    <title>{% block header_title %}{% endblock %}</title>
 </head>
+
 <body >
     <main class="contenedor-principal">
         <!-- Imagen principal -->
         <div>
-            <img width="500" src="{% static '/img/invitado-img.png' %}" alt="">
+            <img  src="{% static '/img/invitado-img.png' %}" alt="">
         </div>
-        <!-- Formularios -->
-        <div>
+        <!-- Content -->
+        <div class="contenido-contenedor">
+            <!-- Title  -->
+            <h1 class="mb-4">{% block titulo %} {% endblock %}</h1>
+            <h2 class="mb-4">{% block descripcion %} {% endblock %}</h2>
             {% block contenido %}
             {% endblock %}
         </div>

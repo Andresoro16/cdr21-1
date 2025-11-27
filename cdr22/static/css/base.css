@@ -1,10 +1,19 @@
+@import './colors.css';
+
 html{
     font-size: 4px;
     font-family: Arial, Helvetica, sans-serif;
+    color : rgb(var(--color-black));
 }
 
 body {
     font-size: 4rem;
+}
+h1 {
+    font-size: 6rem;
+}
+h2 {
+    font-size: 5rem;
 }
 
 input, textarea, select, button {
@@ -16,4 +25,11 @@ input {
     padding: 8px;
     font-size: inherit;
     border: 0;
+}
+img {
+    max-width: 100%;
+}
+
+.mb-4{
+    margin-bottom: 16px;
 }
