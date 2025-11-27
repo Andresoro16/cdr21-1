@@ -1,2 +1,11 @@
 venv/
 .env
+__pycache__/
+*.py[cod]
+*.pyo
+# Archivos de SQLite (si es de pruebas)
+db.sqlite3
+
+# Configuración de editor
+.vscode/
+.idea/

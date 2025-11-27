@@ -6,4 +6,7 @@ def principal (request):
 def login(request):
     return render(request, 'invitado/login.html')
 
+def home(request):
+    return render(request, 'dashboard/home.html')
+
 # Create your views here.
