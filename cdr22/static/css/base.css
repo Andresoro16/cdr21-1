@@ -33,3 +33,6 @@ img {
 .mb-4{
     margin-bottom: 16px;
 }
+ul, li, ol {
+    list-style: none;
+}

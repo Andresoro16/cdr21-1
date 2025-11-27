@@ -6,26 +6,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/base.css'%}">
-    {% block header_title %}
-    {% endblock header_title %}
-    <title>{% block titulo %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/autenticado.css'%}">
+    {% block head %}
+    {% endblock head %}
+    <title>{% block header_title %}{% endblock %}</title>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li>
-                    <a href="">
+    {# {% include "components/dashboard/header_mobile.html" %} #}
+    <header class="header">
+        <!-- Button Mobile -->
+        <input type="checkbox" id="menu-toggle" class="menu_toggle">
+        <label for="menu-toggle" class="menu_button">
+            <div class="icon">
+                {% include "components/icons/menu_hamburguer.html" %}
+            </div>
+        </label>
+        <!-- Logo -->
+        <div class="header_logo_container">
+            <img   src="{% static '/img/invitado-img.png' %}" alt="">
+        </div>
+        <nav class="nav">
+             <label for="menu-toggle" class="close_button">✕</label>
+            <!-- Lista de navegacion -->
+            <ul class="nav_list">
+                <li class="nav_list_item">
+                    <a class="nav_list_item_link" href="">
                         <!-- Icono -->
-                         {% include "components/icons/home.html" %}
+                        {% include "components/icons/home.html" %}
                         Inicio
+                    </a>
+                </li>
+                <li class="nav_list_item">
+                    <a class="nav_list_item_link" href="">
+                        <!-- Icono -->
+                        {% include "components/icons/product.html" %}
+                        Productos
+                    </a>
+                </li>
+                <li class="nav_list_item">
+                    <a class="nav_list_item_link" href="">
+                        <!-- Icono -->
+                        {% include "components/icons/invoice.html" %}
+                        Facturación
+                    </a>
+                </li>
+                <li class="nav_list_item">
+                    <a class="nav_list_item_link" href="">
+                        <!-- Icono -->
+                        {% include "components/icons/users.html" %}
+                        Usuarios
+                    </a>
+                </li>
+                <li class="nav_list_item">
+                    <a class="nav_list_item_link" href="">
+                        <!-- Icono -->
+                        {% include "components/icons/settings.html" %}
+                        Configuraciones
                     </a>
                 </li>
             </ul>
         </nav>
     </header>
-    {% block contenido %}
-    {% endblock %}
+    <main class="main_content">
+        {% block contenido %}
+        {% endblock %}
+    </main>
     <footer>
         <a href=""></a>
     </footer>

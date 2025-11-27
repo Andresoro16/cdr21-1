@@ -1,0 +1,103 @@
+.header {
+    justify-content: space-between;
+    height: 90px;
+    background-color: rgb(var(--color-blue) / 0.2);
+    align-items: center;
+    display: flex;
+    padding-inline: 8px;
+}
+
+.menu_toggle{
+    display: none;
+}
+
+
+/* Cuando el checkbox está marcado, mostramos el sidebar */
+.menu_toggle:checked ~ .nav {
+    transform: translateX(0);
+}
+
+.header .icon, .close_button{
+    cursor: pointer;
+}
+
+.header .logo {
+    max-height: 100%;
+}
+
+.header_logo_container{
+    height: 100%;
+}
+.header_logo_container img {
+    max-height: 100%;
+}
+
+
+.nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: rgb(var(--color-blue) / 0.5);
+    color: #fff;
+    transform: translateX(-200%);   /* escondido a la izquierda */
+    transition: transform 0.3s ease;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav_list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav_list_item{
+    padding: 16px;
+}
+.nav_list_item.active {
+    background-color: rgb(var(--color-blue) / 0.5);
+    color: var(--color-white)!important;
+}
+
+
+.nav_list_item_link{
+    display: flex;
+    align-items: center;
+    gap : 4px;
+}
+
+.main_content{
+    padding: 16px;
+    background-color: rgb(var(--color-blue) / 0.1) ;
+    min-height: 100vh;
+}
+
+/* Tablet > Styles */
+
+@media (min-width: 768px) {
+    .header{
+        justify-content: space-between;
+    }
+    .nav {
+        position: relative;
+        height: 100%;
+        width: max-content;
+        background: transparent;
+        color: unset;
+        transform: none;
+        padding: 0px;
+        display: flex;
+    }
+    .nav_list{
+        flex-direction: row;
+    }
+    .close_button{
+        display: none   ;
+    }
+    .menu_button{
+        display: none;
+    }
+}
