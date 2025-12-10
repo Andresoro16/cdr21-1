@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/**
+  * A catch-all path to Django template files, JavaScript, and Python files
+  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
+  *
+  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
+  * the scope of this path.
+  */
+@source "../../../**/*.{html,py,js}";
+
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Custom */
+  --success : oklch(98.6% 0.031 120.757);
+  --success-foreground : oklch(76.8% 0.233 130.85);
+  --warning : oklch(98.7% 0.026 102.212);
+  --warning-foreground: oklch(79.5% 0.184 86.047);
+
+
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Custom */
+  --color-success : var(--success);
+  --color-success-foreground : var(--success-foreground);
+  --color-warning : var(--warning);
+  --color-warning-foreground : var(--warning-foreground);
+}
+
+@layer components {
+  .link-text {
+    @apply text-sm text-blue-400 underline hover:no-underline cursor-pointer;
+  }
+  .contenedor {
+    @apply w-full h-full max-w-[1280px] px-4 md:px-0 mx-auto;
+  }
+  .contenedor-contenido{
+
+  }
+
+  .formulario {
+    @apply flex flex-col gap-4 h-full;
+  }
+
+  .formulario_campo {
+    @apply flex flex-col gap-2;
+  }
+
+  .formulario_label {
+    @apply text-secondary-foreground;
+  }
+
+  .formulario_input {
+    /* padding: 4rem; border-radius: 2rem; */
+    @apply p-4 rounded-3xl border border-primary;
+  }
+
+  .formulario_boton {
+    /* padding: 16px; border-radius: 16px; */
+    @apply py-2 px-4 rounded-xl cursor-pointer;
+  }
+
+  .formulario_boton_principal {
+    @apply bg-primary text-primary-foreground border;
+  }
+
+  .formulario_boton_verde {
+    @apply bg-green-500 text-green-100 border border-green-700;
+  }
+
+  .formulario_boton_verde:hover {
+    @apply bg-green-700;
+  }
+
+  .formulario_boton_azul{
+    @apply bg-blue-500 text-blue-100 border border-blue-700;
+  }
+  .formulario_boton_azul:hover{
+    @apply bg-blue-700;
+  }
+}
