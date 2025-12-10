@@ -1,71 +1,74 @@
 {% load static %}
-
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/base.css'%}">
-    <link rel="stylesheet" href="{% static 'css/autenticado.css'%}">
+    {% tailwind_css %}
+    <!-- <link rel="stylesheet" href="{% static 'css/base.css'%}">
+    <link rel="stylesheet" href="{% static 'css/autenticado.css'%}"> -->
     {% block head %}
     {% endblock head %}
     <title>{% block header_title %}{% endblock %}</title>
 </head>
 <body>
     {# {% include "components/dashboard/header_mobile.html" %} #}
-    <header class="header">
-        <!-- Button Mobile -->
-        <input type="checkbox" id="menu-toggle" class="menu_toggle">
-        <label for="menu-toggle" class="menu_button">
-            <div class="icon">
-                {% include "components/icons/menu_hamburguer.html" %}
+    <header  class="bg-secondary">
+        <div class="auth_header max-w-[1280px] mx-auto ">
+            <!-- Button Mobile -->
+            <input type="checkbox" id="auth_menu-toggle" class="auth_menu_toggle">
+            <label for="auth_menu-toggle" class="auth_menu_button">
+                <div class="icon">
+                    {% include "components/icons/menu_hamburguer.html" %}
+                </div>
+            </label>
+            <!-- Logo -->
+            <div class="auth_header_logo_container">
+                <img   src="{% static '/img/invitado-img.png' %}" alt="">
             </div>
-        </label>
-        <!-- Logo -->
-        <div class="header_logo_container">
-            <img   src="{% static '/img/invitado-img.png' %}" alt="">
+            <nav class="auth_nav">
+                 <label for="auth_menu-toggle" class="close_button text-secondary-foreground cursor-pointer hover:bg-secondary-foreground hover:text-secondary md:hidden w-max rounded-full">{% include "components/icons/x.html" %}</label>
+                <!-- Lista de auth_navegacion -->
+                <ul class="auth_nav_list">
+                    <li class="auth_nav_list_item">
+                        <a class="auth_nav_list_item_link" href="">
+                            <!-- Icono -->
+                            {% include "components/icons/home.html" %}
+                            Inicio
+                        </a>
+                    </li>
+                    <li class="auth_nav_list_item">
+                        <a class="auth_nav_list_item_link" href="">
+                            <!-- Icono -->
+                            {% include "components/icons/product.html" %}
+                            Productos
+                        </a>
+                    </li>
+                    <li class="auth_nav_list_item">
+                        <a class="auth_nav_list_item_link" href="">
+                            <!-- Icono -->
+                            {% include "components/icons/invoice.html" %}
+                            Facturación
+                        </a>
+                    </li>
+                    <li class="auth_nav_list_item">
+                        <a class="auth_nav_list_item_link" href="">
+                            <!-- Icono -->
+                            {% include "components/icons/users.html" %}
+                            Usuarios
+                        </a>
+                    </li>
+                    <li class="auth_nav_list_item">
+                        <a class="auth_nav_list_item_link" href="">
+                            <!-- Icono -->
+                            {% include "components/icons/settings.html" %}
+                            Configuraciones
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <nav class="nav">
-             <label for="menu-toggle" class="close_button">✕</label>
-            <!-- Lista de navegacion -->
-            <ul class="nav_list">
-                <li class="nav_list_item">
-                    <a class="nav_list_item_link" href="">
-                        <!-- Icono -->
-                        {% include "components/icons/home.html" %}
-                        Inicio
-                    </a>
-                </li>
-                <li class="nav_list_item">
-                    <a class="nav_list_item_link" href="">
-                        <!-- Icono -->
-                        {% include "components/icons/product.html" %}
-                        Productos
-                    </a>
-                </li>
-                <li class="nav_list_item">
-                    <a class="nav_list_item_link" href="">
-                        <!-- Icono -->
-                        {% include "components/icons/invoice.html" %}
-                        Facturación
-                    </a>
-                </li>
-                <li class="nav_list_item">
-                    <a class="nav_list_item_link" href="">
-                        <!-- Icono -->
-                        {% include "components/icons/users.html" %}
-                        Usuarios
-                    </a>
-                </li>
-                <li class="nav_list_item">
-                    <a class="nav_list_item_link" href="">
-                        <!-- Icono -->
-                        {% include "components/icons/settings.html" %}
-                        Configuraciones
-                    </a>
-                </li>
-            </ul>
-        </nav>
     </header>
     <main class="main_content">
         {% block contenido %}
