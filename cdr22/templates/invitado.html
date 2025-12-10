@@ -1,26 +1,27 @@
 {% load static %}
-
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/invitado.css'%}">
+    <!-- <link rel="stylesheet" href="{% static 'css/invitado.css'%}"> -->
+     {% tailwind_css %}
     {% block estilos %}{% endblock %}
     <title>{% block header_title %}{% endblock %}</title>
 </head>
 
-<body >
-    <main class="contenedor-principal">
+<body class="min-h-screen w-full flex items-center justify-center bg-background" >
+    <main class="contenedor grid md:grid-cols-2 bg-secondary text-secondary-foreground rounded-2xl overflow-hidden">
         <!-- Imagen principal -->
         <div>
             <img  src="{% static '/img/invitado-img.png' %}" alt="">
         </div>
         <!-- Content -->
-        <div class="contenido-contenedor">
+        <div class="p-4">
             <!-- Title  -->
-            <h1 class="mb-4">{% block titulo %} {% endblock %}</h1>
-            <h2 class="mb-4">{% block descripcion %} {% endblock %}</h2>
+            <h1 class="mb-4 text-xl md:text-2xl font-bold ">{% block titulo %} {% endblock %}</h1>
+            <h2 class="mb-4 text-muted-foreground">{% block descripcion %} {% endblock %}</h2>
             {% block contenido %}
             {% endblock %}
         </div>
