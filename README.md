@@ -11,3 +11,5 @@
 ## Produccion
 - python manage.py tailwind build
 
+## Cambios para las variables CSS
+
