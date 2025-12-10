@@ -1,0 +1,89 @@
+@layer components {
+  .auth_header {
+    @apply flex justify-between items-center px-2 bg-secondary text-secondary-foreground max-w-[1280px];
+    height: 90px;
+  }
+
+  .auth_menu_toggle {
+    display: none;
+  }
+
+  /* Cuando el checkbox está marcado, mostramos el sidebar */
+  .auth_menu_toggle:checked ~ .auth_nav {
+    transform: translateX(0);
+  }
+
+  .auth_header .auth_icon,
+  .auth_close_button {
+    cursor: pointer;
+  }
+
+  .auth_header_logo {
+    max-height: 100%;
+  }
+
+  .auth_header_logo_container {
+    height: 100%;
+  }
+
+  .auth_header_logo_container img {
+    max-height: 100%;
+  }
+
+  .auth_nav {
+    @apply fixed top-0 left-0 flex flex-col p-4 bg-secondary text-secondary-foreground;
+    width: 240px;
+    height: 100vh;
+    color: #fff;
+    transform: translateX(-200%);   /* escondido a la izquierda */
+    transition: transform 0.3s ease;
+  }
+
+  .auth_nav_list {
+    @apply flex flex-col gap-2 md:h-full md:items-center;
+  }
+
+  .auth_nav_list_item {
+    @apply p-4;
+  }
+
+  .auth_nav_list_item.active {
+    background-color: rgb(var(--color-blue) / 0.5);
+    color: var(--color-white) !important;
+  }
+
+  .auth_nav_list_item_link {
+    @apply flex items-center gap-1 text-secondary-foreground;
+  }
+
+  .auth_main_content {
+    @apply p-4 min-h-screen;
+    background-color: rgb(var(--color-blue) / 0.1);
+  }
+
+  /* Tablet > Styles */
+  @media (min-width: 768px) {
+    .auth_nav {
+      position: relative;
+      height: 100%;
+      width: max-content;
+      background: transparent;
+      color: unset;
+      transform: none;
+      padding: 0;
+      display: flex;
+    }
+
+    .auth_nav_list {
+      @apply flex-row;
+    }
+
+    .auth_close_button {
+      display: none;
+    }
+
+    .auth_menu_button {
+      display: none;
+    }
+  }
+}

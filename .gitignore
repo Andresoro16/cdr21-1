@@ -9,3 +9,5 @@ db.sqlite3
 # Configuración de editor
 .vscode/
 .idea/
+
+theme/static/css/dist/
