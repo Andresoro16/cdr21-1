@@ -10,4 +10,4 @@ db.sqlite3
 .vscode/
 .idea/
 
-./theme/static/css.dist/
+./theme/static/css/dist/
