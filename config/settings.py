@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cdr22',
     'tailwind',
-    'theme'
+    'theme',
+    'crispy_forms',
+    'crispy_tailwind',
 ]
 
 if DEBUG:
@@ -68,7 +70,7 @@ if DEBUG:
         "django_browser_reload.middleware.BrowserReloadMiddleware",
     ]
 
-ROOT_URLCONF = 'cdr21.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -85,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'cdr21.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -139,10 +141,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'gesym' / 'static',
+    BASE_DIR / 'cdr22' / 'static',
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Crispy Settings.
+CRISPY_ALLOWED_TEMPLATE_PACKS = "crispy-tailwind"
+CRISPY_TEMPLATE_PACK = "crispy-tailwind"    

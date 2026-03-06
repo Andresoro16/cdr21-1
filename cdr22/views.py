@@ -14,5 +14,8 @@ def olvidePassword(request):
 def home(request):
     return render(request, 'dashboard/home.html')
 
+def testing(request):
+    return render(request, 'testing.html')
+
 
 # Create your views here.

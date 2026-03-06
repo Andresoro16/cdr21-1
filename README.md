@@ -2,7 +2,7 @@
 
 - Abrir una terminal dentro del proyecto
 - ejecutar `.\venv\Scripts\activate`
-- ejecutar `pip install`
+- ejecutar `pip install -r requirements.txt`
 - ejecutar ` python manage.py tailwind start`
 - Abrimos otra terminal
 - ejecutar `python manage.py runserver`
