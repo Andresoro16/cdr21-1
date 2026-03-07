@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'theme',
     'crispy_forms',
     'crispy_tailwind',
+    'rest_framework'
 ]
 
 if DEBUG:
