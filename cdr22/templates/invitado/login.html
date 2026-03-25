@@ -1,4 +1,5 @@
 {% extends 'invitado.html' %}
+{% load static %}
 
 {% block header_title %} Inicio de sesión {% endblock header_title %}
 
@@ -7,12 +8,13 @@
 {% block descripcion %} Ingrese sus credenciales para ingresar al sistema {% endblock descripcion %}
 
 {% block contenido %}
-<form class="formulario" action="">
+<form class="formulario" action="" id="form">
+    {% csrf_token %}
     <div class="formulario_campo">
-        <label class="formulario_label" for="correo">
-            Correo
+        <label class="formulario_label" for="user">
+            Usuario
         </label>
-        <input class="formulario_input" type="text" id="correo" placeholder="sergio@hotmail.com">
+        <input class="formulario_input" type="text" id="user" placeholder="sergio@hotmail.com">
     </div>
     <div class="formulario_campo">
         <label class="formulario_label" for="password">
@@ -20,9 +22,14 @@
         </label>
         <input class="formulario_input" type="password" id="password" placeholder="********">
     </div>
+    <p id="error" class="text-red-400 "></p>
     <div class="flex flex-col gap-4 w-max">
         <button class="formulario_boton formulario_boton_verde" type="submit">Inicio de sesión</button>
         <a class="link-text" type="submit" href="/olvide-password">¿Olvidaste la contraseña? Click Aqui</a>
     </div>
 </form>
+
 {% endblock contenido %}
+{% block body_end %}
+<script src="{% static 'js/authentication/login.js' %}"></script>
+{% endblock body_end %}

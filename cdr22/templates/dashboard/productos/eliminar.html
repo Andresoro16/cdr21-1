@@ -1,0 +1,82 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Eliminar Producto {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-2xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Eliminar Producto" descripcion="Esta acción no se puede deshacer" %}
+    
+    <div class="bg-white rounded-lg shadow p-8">
+        <!-- Alerta de advertencia -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <div class="text-red-600 text-2xl">⚠️</div>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-red-800">Confirmar Eliminación</h3>
+                    <p class="mt-2 text-sm text-red-700">
+                        ¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del producto -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Información del Producto</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="text-sm font-medium text-gray-600">SKU:</span>
+                    <p class="font-mono text-sm">{{ producto.sku }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Nombre:</span>
+                    <p class="text-sm">{{ producto.nombre }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Categoría:</span>
+                    <p class="text-sm">
+                        {% if producto.categoria %}
+                            {{ producto.categoria.nombre }}
+                        {% else %}
+                            Sin categoría
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Marca:</span>
+                    <p class="text-sm">{{ producto.marca }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Precio Venta:</span>
+                    <p class="text-sm font-semibold text-green-600">${{ producto.precio_venta }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Estado:</span>
+                    <span class="px-2 py-1 rounded text-xs font-semibold 
+                        {% if producto.estado == 'activo' %}bg-green-100 text-green-800
+                        {% elif producto.estado == 'inactivo' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ producto.get_estado_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de confirmación -->
+        <form method="POST">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <button type="submit" class="formulario_boton" style="background-color: #dc2626; color: white;">
+                    🗑️ Eliminar Definitivamente
+                </button>
+                <a href="{% url 'productos_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

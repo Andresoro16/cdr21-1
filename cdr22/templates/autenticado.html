@@ -15,7 +15,7 @@
 <body>
     {# {% include "components/dashboard/header_mobile.html" %} #}
     <header  class="bg-secondary">
-        <div class="auth_header max-w-[1280px] mx-auto ">
+        <div class="auth_header max-w-7xl mx-auto ">
             <!-- Button Mobile -->
             <input type="checkbox" id="auth_menu-toggle" class="auth_menu_toggle">
             <label for="auth_menu-toggle" class="auth_menu_button">
@@ -32,14 +32,14 @@
                 <!-- Lista de auth_navegacion -->
                 <ul class="auth_nav_list">
                     <li class="auth_nav_list_item">
-                        <a class="auth_nav_list_item_link" href="">
+                        <a class="auth_nav_list_item_link" href="{% url 'home' %}">
                             <!-- Icono -->
                             {% include "components/icons/home.html" %}
                             Inicio
                         </a>
                     </li>
                     <li class="auth_nav_list_item">
-                        <a class="auth_nav_list_item_link" href="">
+                        <a class="auth_nav_list_item_link" href="{% url 'productos_index' %}">
                             <!-- Icono -->
                             {% include "components/icons/product.html" %}
                             Productos
@@ -70,7 +70,7 @@
             </nav>
         </div>
     </header>
-    <main class="main_content">
+    <main class="main_content max-w-7xl mx-auto py-4 md:py-8">
         {% block contenido %}
         {% endblock %}
     </main>

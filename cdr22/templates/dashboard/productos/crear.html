@@ -1,0 +1,152 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Crear Producto {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-6xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Crear Nuevo Producto" descripcion="Complete los campos para agregar un nuevo producto al inventario" %}
+    
+    <form method="POST" class="bg-white rounded-lg shadow p-8">
+        {% csrf_token %}
+        
+        <!-- Grid responsive: 1 columna en móvil, 2 columnas en desktop -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- SKU -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="sku">SKU *</label>
+                <input 
+                    type="text" 
+                    id="sku" 
+                    name="sku" 
+                    placeholder="Código único del producto"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Nombre -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="nombre">Nombre del Producto *</label>
+                <input 
+                    type="text" 
+                    id="nombre" 
+                    name="nombre" 
+                    placeholder="Ej: Pastilla de Freno HQ"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Categoría -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="categoria">Categoría *</label>
+                <select 
+                    id="categoria" 
+                    name="categoria" 
+                    class="formulario_input"
+                    required
+                >
+                    <option value="">-- Selecciona una categoría --</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Marca -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="marca">Marca *</label>
+                <input 
+                    type="text" 
+                    id="marca" 
+                    name="marca" 
+                    placeholder="Ej: Bosch, Gates, etc"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Precio Costo -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="precio_costo">Precio Costo ($) *</label>
+                <input 
+                    type="number" 
+                    id="precio_costo" 
+                    name="precio_costo" 
+                    placeholder="0.00"
+                    step="0.01"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Precio Venta -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="precio_venta">Precio Venta ($) *</label>
+                <input 
+                    type="number" 
+                    id="precio_venta" 
+                    name="precio_venta" 
+                    placeholder="0.00"
+                    step="0.01"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Garantía -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="garantia_meses">Garantía (meses) *</label>
+                <input 
+                    type="number" 
+                    id="garantia_meses" 
+                    name="garantia_meses" 
+                    placeholder="12"
+                    value="12"
+                    class="formulario_input"
+                    required
+                >
+            </div>
+
+            <!-- Estado -->
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="estado">Estado *</label>
+                <select 
+                    id="estado" 
+                    name="estado" 
+                    class="formulario_input"
+                    required
+                >
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                    <option value="descontinuado">Descontinuado</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Descripción - Ocupa el ancho completo -->
+        <div class="mb-6 flex flex-col">
+            <label class="formulario_label mb-2" for="descripcion">Descripción *</label>
+            <textarea 
+                id="descripcion" 
+                name="descripcion" 
+                placeholder="Detalle del producto..."
+                class="formulario_input"
+                rows="4"
+                required
+            ></textarea>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4">
+            <button type="submit" class="formulario_boton formulario_boton_verde">
+                Crear Producto
+            </button>
+            <a href="{% url 'productos_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock contenido %}
