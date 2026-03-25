@@ -1,0 +1,32 @@
+<!-- Componente de perfil de usuario -->
+<div class="flex items-center space-x-3 text-secondary-foreground">
+    <!-- Círculo con inicial -->
+    <div class="w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold text-lg">
+        {% if user.first_name %}
+            {{ user.first_name|slice:":1"|upper }}
+        {% else %}
+            {{ user.username|slice:":1"|upper }}
+        {% endif %}
+    </div>
+    
+    <!-- Información del usuario -->
+    <div class="hidden md:block">
+        <p class="text-sm font-medium">
+            {% if user.first_name and user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% elif user.first_name %}
+                {{ user.first_name }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </p>
+        <p class="text-xs text-secondary-foreground/70">{{ user.email|default:"Usuario" }}</p>
+    </div>
+    
+    <!-- Dropdown (opcional) -->
+    <div class="hidden md:block">
+        <button class="text-secondary-foreground/70 hover:text-secondary-foreground transition-colors">
+            {% include "components/icons/chevron_down.html" %}
+        </button>
+    </div>
+</div>
