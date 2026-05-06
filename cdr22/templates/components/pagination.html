@@ -9,18 +9,18 @@
     <!-- Controles de paginación -->
     <div class="flex space-x-2">
         {% if pagina.has_previous %}
-            <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                ◀ Primera
+            <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Primera página">
+                {% include 'components/icons/square_chevron_left.html' %}
             </a>
-            <a href="?page={{ pagina.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                ◀ Anterior
+            <a href="?page={{ pagina.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Página anterior">
+                {% include 'components/icons/square_chevron_left.html' %}
             </a>
         {% else %}
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
-                ◀ Primera
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Primera página">
+                {% include 'components/icons/square_chevron_left.html' %}
             </button>
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
-                ◀ Anterior
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Página anterior">
+                {% include 'components/icons/square_chevron_left.html' %}
             </button>
         {% endif %}
 
@@ -30,18 +30,18 @@
         </div>
 
         {% if pagina.has_next %}
-            <a href="?page={{ pagina.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                Siguiente ▶
+            <a href="?page={{ pagina.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Página siguiente">
+                {% include 'components/icons/square_chevron_right.html' %}
             </a>
-            <a href="?page={{ pagina.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                Última ▶
+            <a href="?page={{ pagina.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Última página">
+                {% include 'components/icons/square_chevron_right.html' %}
             </a>
         {% else %}
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
-                Siguiente ▶
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Página siguiente">
+                {% include 'components/icons/square_chevron_right.html' %}
             </button>
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
-                Última ▶
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Última página">
+                {% include 'components/icons/square_chevron_right.html' %}
             </button>
         {% endif %}
     </div>
