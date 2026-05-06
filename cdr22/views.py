@@ -160,3 +160,12 @@ def productos_eliminar(request, producto_id):
     return render(request, 'dashboard/productos/eliminar.html', {
         'producto': producto
     })
+
+@login_required(login_url='login')
+def pos(request):
+    return render(request, 'dashboard/pos/index.html')
+    if request.method == 'GET':
+        return render(request, 'dashboard/pos/index.html')
+    
+    #POS
+    return redirect('pos')

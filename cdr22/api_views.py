@@ -3,7 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from .models import Orden
+from django.db import models
+from .models import Orden, Producto
 from .serializers import OrdenSerializer, OrdenReadSerializer
 import json
 
@@ -83,3 +84,39 @@ class Reportes(View):
             }
         })
 
+@method_decorator(csrf_exempt, name='dispatch')
+class ProductoSearchAPIView(View):
+    def get(self, request):
+        query = request.GET.get('q', '').strip()
+        
+        if not query:
+            return JsonResponse({
+                "mensaje": "Debe proporcionar un parámetro de búsqueda 'q'",
+                "productos": []
+            }, status=400)
+        
+        # Buscar por SKU, nombre o marca
+        productos = Producto.objects.filter(
+            estado='activo'
+        ).filter(
+            models.Q(sku__icontains=query) | 
+            models.Q(nombre__icontains=query) | 
+            models.Q(marca__icontains=query)
+        )[:10]  # Limitar a 10 resultados
+        
+        resultado = []
+        for producto in productos:
+            resultado.append({
+                'id': producto.id,
+                'sku': producto.sku,
+                'nombre': producto.nombre,
+                'marca': producto.marca,
+                'precio_venta': float(producto.precio_venta),
+                'stock': producto.stock,
+                'categoria': producto.categoria.nombre if producto.categoria else None,
+            })
+        
+        return JsonResponse({
+            "mensaje": "Productos encontrados",
+            "productos": resultado
+        })

@@ -1,8 +1,303 @@
 {% extends 'autenticado.html' %}
 {% load static %}
 
-{% block header_title %} Productos {% endblock header_title %}
+{% block header_title %} Punto de Venta {% endblock header_title %}
 
 {% block contenido %}
-<p>HOLA!</p>
+<div class="max-w-7xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Punto de Venta (POS)" descripcion="Gestione las ventas en el punto de venta" %}
+
+    <!-- SECCIÓN CLIENTE - PRIMERA -->
+    <div class="mt-8 bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-6">Información del Cliente</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Cédula -->
+            <div>
+                <label for="cliente_cedula" class="block text-sm font-medium mb-2">Cédula</label>
+                <div class="flex gap-2">
+                    <input 
+                        type="text" 
+                        id="cliente_cedula" 
+                        placeholder="Ej: 1234567890"
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                    <button 
+                        id="btn_buscar_cliente"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+                    >
+                        Buscar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nombre -->
+            <div>
+                <label for="cliente_nombre" class="block text-sm font-medium mb-2">Nombre</label>
+                <input 
+                    type="text" 
+                    id="cliente_nombre"
+                    placeholder="Nombre del cliente"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+
+            <!-- Apellidos -->
+            <div>
+                <label for="cliente_apellidos" class="block text-sm font-medium mb-2">Apellidos</label>
+                <input 
+                    type="text" 
+                    id="cliente_apellidos"
+                    placeholder="Apellidos del cliente"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div>
+                <label for="cliente_email" class="block text-sm font-medium mb-2">Correo Electrónico</label>
+                <input 
+                    type="email" 
+                    id="cliente_email"
+                    placeholder="correo@ejemplo.com"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label for="cliente_telefono" class="block text-sm font-medium mb-2">Teléfono</label>
+                <input 
+                    type="text" 
+                    id="cliente_telefono"
+                    placeholder="Ej: 0412-1234567"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 mt-8">
+        <!-- SECCIÓN BÚSQUEDA DE PRODUCTOS -->
+        <div class="col-span-3 bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">Agregar Productos</h2>
+
+            <!-- Búsqueda de productos -->
+            <div class="flex gap-2 mb-4">
+                <input 
+                    type="text" 
+                    id="producto_search"
+                    placeholder="Buscar por SKU, nombre o marca..."
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+
+            <!-- Resultados de búsqueda -->
+            <div id="resultados_productos" class="space-y-2 hidden">
+                <div class="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
+                    <ul id="lista_resultados" class="divide-y">
+                        <!-- Se llenan dinámicamente con JavaScript -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE PRODUCTOS SELECCIONADOS -->
+    <div class="mt-8 bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Productos en el Carrito</h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="table-header">SKU</th>
+                        <th class="table-header">Producto</th>
+                        <th class="table-header">Precio Unitario</th>
+                        <th class="table-header">Cantidad</th>
+                        <th class="table-header">Subtotal</th>
+                        <th class="table-header text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="carrito_tbody">
+                    <tr id="carrito_vacio">
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <div class="text-4xl mb-4">🛒</div>
+                                <p class="text-lg font-medium">El carrito está vacío</p>
+                                <p class="text-sm">Busca productos para agregar</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resumen de totales -->
+        <div class="mt-6 flex justify-end">
+            <div class="w-full max-w-xs space-y-2">
+                <div class="flex justify-between py-2 border-b">
+                    <span class="font-medium">Subtotal:</span>
+                    <span id="total_subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between py-2 border-b">
+                    <span class="font-medium">Impuesto (0%):</span>
+                    <span id="total_impuesto">$0.00</span>
+                </div>
+                <div class="flex justify-between py-3 bg-blue-50 px-3 rounded-md">
+                    <span class="font-bold text-lg">Total:</span>
+                    <span id="total_final" class="font-bold text-lg text-blue-600">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="mt-6 flex gap-3 justify-end">
+            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
+                Cancelar Venta
+            </button>
+            <button class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium">
+                Completar Venta
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Estado del carrito
+    let carrito = [];
+
+    // Búsqueda de productos
+    const productoSearchInput = document.getElementById('producto_search');
+    productoSearchInput.addEventListener('input', async (e) => {
+        const query = e.target.value.trim();
+        
+        if (query.length < 2) {
+            document.getElementById('resultados_productos').classList.add('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/productos/search/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            
+            const listaResultados = document.getElementById('lista_resultados');
+            listaResultados.innerHTML = '';
+
+            data.productos.forEach(producto => {
+                const li = document.createElement('li');
+                li.className = 'p-3 hover:bg-blue-50 cursor-pointer transition-colors';
+                li.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">${producto.nombre}</p>
+                            <p class="text-sm text-gray-600">SKU: ${producto.sku} | Stock: ${producto.stock}</p>
+                        </div>
+                        <span class="font-semibold text-green-600">$${producto.precio_venta}</span>
+                    </div>
+                `;
+                li.addEventListener('click', () => agregarAlCarrito(producto));
+                listaResultados.appendChild(li);
+            });
+
+            document.getElementById('resultados_productos').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error al buscar productos:', error);
+        }
+    });
+
+    // Agregar producto al carrito
+    function agregarAlCarrito(producto) {
+        const itemExistente = carrito.find(item => item.id === producto.id);
+        
+        if (itemExistente) {
+            itemExistente.cantidad++;
+        } else {
+            carrito.push({
+                id: producto.id,
+                sku: producto.sku,
+                nombre: producto.nombre,
+                precio_unitario: producto.precio_venta,
+                cantidad: 1
+            });
+        }
+
+        actualizarCarrito();
+        document.getElementById('producto_search').value = '';
+        document.getElementById('resultados_productos').classList.add('hidden');
+    }
+
+    // Actualizar visualización del carrito
+    function actualizarCarrito() {
+        const carritoTbody = document.getElementById('carrito_tbody');
+        const carritoVacio = document.getElementById('carrito_vacio');
+
+        if (carrito.length === 0) {
+            carritoTbody.innerHTML = `
+                <tr id="carrito_vacio">
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <div class="text-4xl mb-4">🛒</div>
+                            <p class="text-lg font-medium">El carrito está vacío</p>
+                            <p class="text-sm">Busca productos para agregar</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        carritoTbody.innerHTML = carrito.map((item, index) => {
+            const subtotal = item.precio_unitario * item.cantidad;
+            return `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="table-data">${item.sku}</td>
+                    <td class="table-data">${item.nombre}</td>
+                    <td class="table-data">$${item.precio_unitario}</td>
+                    <td class="table-data">
+                        <input 
+                            type="number" 
+                            min="1" 
+                            value="${item.cantidad}"
+                            class="w-16 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onchange="actualizarCantidad(${index}, this.value)"
+                        >
+                    </td>
+                    <td class="table-data">$${subtotal.toFixed(2)}</td>
+                    <td class="table-data text-center">
+                        <button onclick="eliminarDelCarrito(${index})" class="px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors text-xs font-medium">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        calcularTotales();
+    }
+
+    // Actualizar cantidad de un producto
+    function actualizarCantidad(index, nuevaCantidad) {
+        carrito[index].cantidad = parseInt(nuevaCantidad) || 1;
+        actualizarCarrito();
+    }
+
+    // Eliminar producto del carrito
+    function eliminarDelCarrito(index) {
+        carrito.splice(index, 1);
+        actualizarCarrito();
+    }
+
+    // Calcular totales
+    function calcularTotales() {
+        const subtotal = carrito.reduce((acc, item) => acc + (item.precio_unitario * item.cantidad), 0);
+        const impuesto = subtotal * 0.00; // 0% por ahora
+        const total = subtotal + impuesto;
+
+        document.getElementById('total_subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('total_impuesto').textContent = `$${impuesto.toFixed(2)}`;
+        document.getElementById('total_final').textContent = `$${total.toFixed(2)}`;
+    }
+</script>
+
 {% endblock contenido %}
