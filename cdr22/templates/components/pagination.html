@@ -1,0 +1,48 @@
+<!-- Componente de paginación reutilizable -->
+<div class="flex items-center justify-between mt-8 px-4 py-4">
+    <!-- Información de paginación -->
+    <div class="text-sm text-gray-600">
+        Mostrando <span class="font-semibold">{{ pagina.paginator.count }}</span> elementos
+        (Página <span class="font-semibold">{{ pagina.number }}</span> de <span class="font-semibold">{{ pagina.paginator.num_pages }}</span>)
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="flex space-x-2">
+        {% if pagina.has_previous %}
+            <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                ◀ Primera
+            </a>
+            <a href="?page={{ pagina.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                ◀ Anterior
+            </a>
+        {% else %}
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
+                ◀ Primera
+            </button>
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
+                ◀ Anterior
+            </button>
+        {% endif %}
+
+        <!-- Indicador de página actual -->
+        <div class="px-3 py-2 text-sm font-medium text-gray-700 bg-blue-50 rounded-md border border-blue-200">
+            {{ pagina.number }} / {{ pagina.paginator.num_pages }}
+        </div>
+
+        {% if pagina.has_next %}
+            <a href="?page={{ pagina.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                Siguiente ▶
+            </a>
+            <a href="?page={{ pagina.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                Última ▶
+            </a>
+        {% else %}
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
+                Siguiente ▶
+            </button>
+            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50">
+                Última ▶
+            </button>
+        {% endif %}
+    </div>
+</div>
