@@ -86,4 +86,13 @@
       display: none;
     }
   }
+
+  /* Estilos reutilizables para tablas */
+  .table-header {
+    @apply px-6 py-3 text-left text-sm font-semibold;
+  }
+
+  .table-data {
+    @apply px-6 py-3 text-sm;
+  }
 }

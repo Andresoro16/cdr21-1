@@ -19,36 +19,36 @@
         <table class="w-full">
             <thead class="bg-gray-200">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">SKU</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Nombre</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Categoría</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Marca</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Precio Venta</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Stock</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold">Estado</th>
-                    <th class="px-6 py-3 text-center text-sm font-semibold">Acciones</th>
+                    <th class="table-header">SKU</th>
+                    <th class="table-header">Nombre</th>
+                    <th class="table-header">Categoría</th>
+                    <th class="table-header">Marca</th>
+                    <th class="table-header">Precio Venta</th>
+                    <th class="table-header">Stock</th>
+                    <th class="table-header">Estado</th>
+                    <th class="table-header">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for producto in productos %}
+                {% for producto in productos.object_list %}
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm font-mono">{{ producto.sku }}</td>
-                    <td class="px-6 py-4 text-sm font-medium">{{ producto.nombre }}</td>
-                    <td class="px-6 py-4 text-sm">
+                    <td class="table-data font-mono">{{ producto.sku }}</td>
+                    <td class="table-data font-medium">{{ producto.nombre }}</td>
+                    <td class="table-data">
                         {% if producto.categoria %}
                             {{ producto.categoria.nombre }}
                         {% else %}
                             <span class="text-gray-400">Sin categoría</span>
                         {% endif %}
                     </td>
-                    <td class="px-6 py-4 text-sm">{{ producto.marca }}</td>
-                    <td class="px-6 py-4 text-sm font-semibold text-green-600">${{ producto.precio_venta }}</td>
-                    <td class="px-6 py-4 text-sm">
+                    <td class="table-data">{{ producto.marca }}</td>
+                    <td class="table-data font-semibold text-green-600">${{ producto.precio_venta }}</td>
+                    <td class="table-data">
                         <span class="{% if producto.stock <= producto.stock_minimo %}text-red-600 font-semibold{% endif %}">
                             {{ producto.stock }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm">
+                    <td class="table-data">
                         <span class="px-2 py-1 rounded text-xs font-semibold 
                             {% if producto.estado == 'activo' %}bg-green-100 text-green-800
                             {% elif producto.estado == 'inactivo' %}bg-yellow-100 text-yellow-800
@@ -56,7 +56,7 @@
                             {{ producto.get_estado_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm text-center">
+                    <td class="table-data text-center">
                         <div class="flex justify-center space-x-2">
                             <a href="{% url 'productos_editar' producto.id %}" 
                                class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">

@@ -3,8 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from cdr22.models import Producto, Categoria
 from django.core.paginator import Paginator
+from cdr22.models import Producto, Categoria
 import json
 
 def principal (request):
@@ -57,6 +57,7 @@ def productos_index(request):
     paginator = Paginator(productos_list, 10)
     page_number = request.GET.get('page')
     productos = paginator.get_page(page_number)
+    
     return render(request, 'dashboard/productos/index.html', {'productos': productos})
 
 @login_required(login_url='login')

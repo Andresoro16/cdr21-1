@@ -1,0 +1,8 @@
+<!-- Contenedor base de tabla - Solo estilos, sin estructura interna -->
+<div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="w-full">
+        {% block table_content %}
+        <!-- El contenido (thead, tbody) se define en el template que incluye esto -->
+        {% endblock %}
+    </table>
+</div>
