@@ -153,10 +153,10 @@
 
         <!-- Botones de acción -->
         <div class="mt-6 flex gap-3 justify-end">
-            <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
+            <button id="btn_cancelar" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
                 Cancelar Venta
             </button>
-            <button class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium">
+            <button id="btn_completar" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium">
                 Completar Venta
             </button>
         </div>
@@ -339,6 +339,91 @@
         document.getElementById('total_impuesto').textContent = `$${impuesto.toFixed(2)}`;
         document.getElementById('total_final').textContent = `$${total.toFixed(2)}`;
     }
+
+    // Completar venta
+    document.getElementById('btn_completar').addEventListener('click', async () => {
+        // Validar que hay cliente
+        const cedula = document.getElementById('cliente_cedula').value.trim();
+        if (!cedula) {
+            alert('Ingrese una cédula del cliente');
+            return;
+        }
+
+        // Validar que hay items en el carrito
+        if (carrito.length === 0) {
+            alert('El carrito está vacío');
+            return;
+        }
+
+        // Obtener datos del cliente
+        const cliente = {
+            cedula: cedula,
+            nombre: document.getElementById('cliente_nombre').value,
+            apellidos: document.getElementById('cliente_apellidos').value,
+            email: document.getElementById('cliente_email').value,
+            telefono: document.getElementById('cliente_telefono').value
+        };
+
+        // Calcular totales
+        const subtotal = carrito.reduce((acc, item) => acc + (item.precio_unitario * item.cantidad), 0);
+        const impuesto = 0;
+        const total = subtotal + impuesto;
+
+        // Preparar datos para enviar
+        const datosOrden = {
+            cliente: cliente,
+            items: carrito,
+            metodo_pago: 'efectivo',
+            subtotal: subtotal,
+            impuesto: impuesto,
+            total: total
+        };
+
+        try {
+            // Enviar orden a la API
+            const response = await fetch('/api/ordenes/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosOrden)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Éxito
+                alert(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: $${data.orden.total}`);
+                
+                // Limpiar formulario
+                limpiarCliente();
+                cedulaInput.value = '';
+                document.getElementById('producto_search').value = '';
+                carrito = [];
+                actualizarCarrito();
+            } else {
+                alert(`❌ Error: ${data.mensaje}`);
+            }
+        } catch (error) {
+            console.error('Error al completar venta:', error);
+            alert('Error al completar la venta');
+        }
+    });
+
+    // Cancelar venta
+    document.getElementById('btn_cancelar').addEventListener('click', () => {
+        if (carrito.length > 0) {
+            if (confirm('¿Descartar la venta actual?')) {
+                limpiarCliente();
+                cedulaInput.value = '';
+                document.getElementById('producto_search').value = '';
+                carrito = [];
+                actualizarCarrito();
+            }
+        } else {
+            alert('No hay venta para cancelar');
+        }
+    });
 </script>
 
 {% endblock contenido %}

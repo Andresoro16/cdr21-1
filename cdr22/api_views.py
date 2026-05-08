@@ -202,3 +202,135 @@ class ClienteCreateAPIView(View):
                 'telefono': cliente.telefono,
             }
         }, status=201)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class OrdenCreateAPIView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({
+                "mensaje": "Mensaje inválido, debe ser JSON"
+            }, status=400)
+        
+        try:
+            # Obtener datos del cliente
+            cliente_data = data.get('cliente', {})
+            cedula = cliente_data.get('cedula', '').strip()
+            
+            if not cedula:
+                return JsonResponse({
+                    "mensaje": "La cédula del cliente es requerida"
+                }, status=400)
+            
+            # Buscar o crear cliente
+            cliente, created = Cliente.objects.get_or_create(
+                cedula=cedula,
+                defaults={
+                    'nombre': cliente_data.get('nombre', ''),
+                    'apellidos': cliente_data.get('apellidos', ''),
+                    'email': cliente_data.get('email', ''),
+                    'telefono': cliente_data.get('telefono', '')
+                }
+            )
+            
+            if not created:
+                # Actualizar datos si el cliente ya existe
+                cliente.nombre = cliente_data.get('nombre', cliente.nombre)
+                cliente.apellidos = cliente_data.get('apellidos', cliente.apellidos)
+                cliente.email = cliente_data.get('email', cliente.email)
+                cliente.telefono = cliente_data.get('telefono', cliente.telefono)
+                cliente.save()
+            
+            # Obtener datos de la orden
+            items = data.get('items', [])
+            metodo_pago = data.get('metodo_pago', 'no especificado')
+            subtotal = float(data.get('subtotal', 0))
+            impuesto = float(data.get('impuesto', 0))
+            total = float(data.get('total', 0))
+            
+            if not items:
+                return JsonResponse({
+                    "mensaje": "La orden debe contener al menos un artículo"
+                }, status=400)
+            
+            # Crear factura
+            from .models import Factura
+            factura_numero = f"FAC-{Factura.objects.count() + 1:06d}"
+            
+            factura = Factura.objects.create(
+                numero=factura_numero,
+                cliente=cliente,
+                subtotal=subtotal,
+                impuesto=impuesto,
+                total=total,
+                metodo_pago=metodo_pago,
+                estado='emitida'
+            )
+            
+            # Crear orden
+            orden = Orden.objects.create(
+                cliente=cliente,
+                factura=factura,
+                metodo_pago=metodo_pago,
+                subtotal=subtotal,
+                impuesto=impuesto,
+                precio_total=total,
+                estado='completada'
+            )
+            
+            # Crear items de la orden
+            from .models import OrdenItem
+            for item in items:
+                # Buscar por 'id' (como lo envía el carrito del POS)
+                producto_id = item.get('id') or item.get('producto_id')
+                
+                if not producto_id:
+                    return JsonResponse({
+                        "mensaje": "Cada item debe tener un id o producto_id"
+                    }, status=400)
+                
+                try:
+                    producto = Producto.objects.get(id=producto_id)
+                except Producto.DoesNotExist:
+                    return JsonResponse({
+                        "mensaje": f"Producto con id {producto_id} no existe"
+                    }, status=404)
+                
+                OrdenItem.objects.create(
+                    orden=orden,
+                    detalle=producto.nombre,
+                    precio=float(item.get('precio_unitario', 0)),
+                    cantidad=int(item.get('cantidad', 1))
+                )
+                
+                # Actualizar stock del producto
+                producto.stock -= int(item.get('cantidad', 1))
+                producto.save()
+            
+            return JsonResponse({
+                "mensaje": "Orden creada exitosamente",
+                "orden": {
+                    'id': orden.id,
+                    'factura_numero': factura.numero,
+                    'cliente': {
+                        'cedula': cliente.cedula,
+                        'nombre': cliente.nombre,
+                        'apellidos': cliente.apellidos,
+                    },
+                    'subtotal': str(orden.subtotal),
+                    'impuesto': str(orden.impuesto),
+                    'total': str(orden.precio_total),
+                    'estado': orden.estado,
+                    'fecha': orden.created_at.isoformat()
+                }
+            }, status=201)
+        
+        except Producto.DoesNotExist:
+            return JsonResponse({
+                "mensaje": "Uno o más productos no existen"
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                "mensaje": f"Error al crear la orden: {str(e)}"
+            }, status=500)

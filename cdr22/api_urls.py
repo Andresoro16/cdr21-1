@@ -8,4 +8,5 @@ urlpatterns = [
     path('productos/search/', api_views.ProductoSearchAPIView.as_view(), name='api.productos.search'),
     path('clientes/search/', api_views.ClienteSearchAPIView.as_view(), name='api.clientes.search'),
     path('clientes/create/', api_views.ClienteCreateAPIView.as_view(), name='api.clientes.create'),
+    path('ordenes/create/', api_views.OrdenCreateAPIView.as_view(), name='api.ordenes.create'),
 ]
