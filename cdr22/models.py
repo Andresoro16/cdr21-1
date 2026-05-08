@@ -89,14 +89,65 @@ class Producto(models.Model):
         return 0
 
 # ============================================
+# FACTURAS
+# ============================================
+
+class Factura(models.Model):
+    ESTADO_CHOICES = [
+        ('emitida', 'Emitida'),
+        ('pagada', 'Pagada'),
+        ('anulada', 'Anulada'),
+        ('pendiente', 'Pendiente de pago'),
+    ]
+    
+    numero = models.CharField(max_length=50, unique=True, help_text="Número de factura")
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, related_name='facturas')
+    
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    impuesto = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Impuesto (IVA, etc.)")
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    metodo_pago = models.CharField(max_length=100, blank=True, null=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='emitida')
+    
+    fecha_emision = models.DateTimeField(auto_now_add=True)
+    fecha_vencimiento = models.DateField(blank=True, null=True)
+    
+    observaciones = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'facturas'
+        verbose_name_plural = 'Facturas'
+        ordering = ['-fecha_emision']
+    
+    def __str__(self):
+        cliente_info = f"{self.cliente.nombre} {self.cliente.apellidos}" if self.cliente else "Sin cliente"
+        return f"Factura #{self.numero} - {cliente_info}"
+
+# ============================================
 # ÓRDENES
 # ============================================
 
 class Orden(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('completada', 'Completada'),
+        ('cancelada', 'Cancelada'),
+    ]
+    
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, related_name='ordenes')
+    factura = models.OneToOneField(Factura, on_delete=models.SET_NULL, null=True, blank=True, related_name='orden')
+    
     metodo_pago = models.CharField(max_length=100)
+    subtotal = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    impuesto = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     precio_total = models.DecimalField(decimal_places=2, max_digits=10)
-    estado = models.CharField(max_length=100)
+    
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
