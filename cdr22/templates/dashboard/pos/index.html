@@ -167,6 +167,47 @@
     // Estado del carrito
     let carrito = [];
 
+    // Búsqueda de clientes
+    const btnBuscarCliente = document.getElementById('btn_buscar_cliente');
+    const cedulaInput = document.getElementById('cliente_cedula');
+    
+    btnBuscarCliente.addEventListener('click', async () => {
+        const cedula = cedulaInput.value.trim();
+        
+        if (!cedula) {
+            alert('Ingrese una cédula');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/clientes/search/?cedula=${encodeURIComponent(cedula)}`);
+            const data = await response.json();
+            
+            if (response.ok && data.cliente) {
+                // Cliente encontrado, rellenar campos
+                document.getElementById('cliente_nombre').value = data.cliente.nombre;
+                document.getElementById('cliente_apellidos').value = data.cliente.apellidos;
+                document.getElementById('cliente_email').value = data.cliente.email || '';
+                document.getElementById('cliente_telefono').value = data.cliente.telefono || '';
+            } else {
+                // Cliente no encontrado
+                limpiarCliente();
+                alert('Cliente no encontrado. Complete los datos para crear uno nuevo.');
+            }
+        } catch (error) {
+            console.error('Error al buscar cliente:', error);
+            alert('Error al buscar el cliente');
+        }
+    });
+
+    // Limpiar formulario de cliente
+    function limpiarCliente() {
+        document.getElementById('cliente_nombre').value = '';
+        document.getElementById('cliente_apellidos').value = '';
+        document.getElementById('cliente_email').value = '';
+        document.getElementById('cliente_telefono').value = '';
+    }
+
     // Búsqueda de productos
     const productoSearchInput = document.getElementById('producto_search');
     productoSearchInput.addEventListener('input', async (e) => {
