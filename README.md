@@ -12,3 +12,12 @@
 - python manage.py tailwind build
 
 ## Cambios para las variables CSS
+
+## Comandos
+
+### Agregar Stock
+
+```bash
+python manage.py add_stock --sku "PROD-001" --cantidad 50
+python manage.py add_stock --id 5 --cantidad 30
+```
