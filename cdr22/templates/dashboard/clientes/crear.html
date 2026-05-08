@@ -1,0 +1,93 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Crear Cliente {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-2xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Crear Nuevo Cliente" descripcion="Complete el formulario para registrar un nuevo cliente" %}
+    
+    {% if error %}
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="cedula" class="formulario_label">Cédula <span class="text-red-500">*</span></label>
+                <input 
+                    type="text" 
+                    name="cedula" 
+                    id="cedula" 
+                    placeholder="Ej: 1234567890"
+                    required
+                    class="formulario_input"
+                >
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="nombre" class="formulario_label">Nombre <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        name="nombre" 
+                        id="nombre" 
+                        placeholder="Ej: Juan"
+                        required
+                        class="formulario_input"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos" class="formulario_label">Apellidos <span class="text-red-500">*</span></label>
+                    <input 
+                        type="text" 
+                        name="apellidos" 
+                        id="apellidos" 
+                        placeholder="Ej: Pérez García"
+                        required
+                        class="formulario_input"
+                    >
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="email" class="formulario_label">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        placeholder="Ej: juan@ejemplo.com"
+                        class="formulario_input"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono" class="formulario_label">Teléfono</label>
+                    <input 
+                        type="tel" 
+                        name="telefono" 
+                        id="telefono" 
+                        placeholder="Ej: +58 412-1234567"
+                        class="formulario_input"
+                    >
+                </div>
+            </div>
+            
+            <div class="flex gap-4 pt-6">
+                <button type="submit" class="formulario_boton formulario_boton_verde">
+                    ✓ Crear Cliente
+                </button>
+                <a href="{% url 'clientes_index' %}" class="formulario_boton formulario_boton_gris">
+                    ← Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

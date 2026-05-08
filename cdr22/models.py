@@ -1,6 +1,29 @@
 from django.db import models
 
 # ============================================
+# CLIENTES
+# ============================================
+
+class Cliente(models.Model):
+    cedula = models.CharField(max_length=20, unique=True, help_text="Cédula de identidad")
+    nombre = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    
+    # Auditoría
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'clientes'
+        verbose_name_plural = 'Clientes'
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return f"{self.nombre} {self.apellidos} - {self.cedula}"
+
+# ============================================
 # PRODUCTOS
 # ============================================
 
@@ -70,9 +93,9 @@ class Producto(models.Model):
 # ============================================
 
 class Orden(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, related_name='ordenes')
     metodo_pago = models.CharField(max_length=100)
     precio_total = models.DecimalField(decimal_places=2, max_digits=10)
-    cliente_cedula = models.CharField(max_length=100)
     estado = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -82,7 +105,8 @@ class Orden(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"Orden #{self.id} - {self.cliente_cedula}"
+        cliente_info = f"{self.cliente.nombre} {self.cliente.apellidos}" if self.cliente else "Sin cliente"
+        return f"Orden #{self.id} - {cliente_info}"
 
 class OrdenItem(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items')  # ← Relación FK

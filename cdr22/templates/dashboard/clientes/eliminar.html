@@ -1,0 +1,56 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Eliminar Cliente {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-2xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Eliminar Cliente" descripcion="Esta acción no se puede deshacer" %}
+    
+    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+        <div class="flex gap-4 items-start mb-6">
+            <div class="text-4xl">⚠️</div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">¿Está seguro?</h3>
+                <p class="text-gray-600">
+                    Va a eliminar permanentemente al cliente <strong>{{ cliente.nombre }} {{ cliente.apellidos }}</strong> (Cédula: {{ cliente.cedula }}).
+                </p>
+                <p class="text-sm text-gray-500 mt-2">Esta acción no se puede deshacer.</p>
+            </div>
+        </div>
+        
+        <!-- Resumen del cliente -->
+        <div class="bg-gray-50 rounded p-4 mb-6">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <dt class="font-semibold text-gray-700">Cédula</dt>
+                    <dd class="text-gray-600 font-mono">{{ cliente.cedula }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Nombre Completo</dt>
+                    <dd class="text-gray-600">{{ cliente.nombre }} {{ cliente.apellidos }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Correo</dt>
+                    <dd class="text-gray-600">{{ cliente.email|default:"No especificado" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Teléfono</dt>
+                    <dd class="text-gray-600">{{ cliente.telefono|default:"No especificado" }}</dd>
+                </div>
+            </dl>
+        </div>
+        
+        <form method="POST" class="flex gap-4">
+            {% csrf_token %}
+            
+            <button type="submit" class="formulario_boton formulario_boton_rojo">
+                🗑️ Eliminar Cliente
+            </button>
+            <a href="{% url 'clientes_index' %}" class="formulario_boton formulario_boton_gris">
+                ← Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

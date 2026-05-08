@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from cdr22.models import Producto, Categoria
+from cdr22.models import Producto, Categoria, Cliente
 import json
 
 def principal (request):
@@ -164,8 +164,79 @@ def productos_eliminar(request, producto_id):
 @login_required(login_url='login')
 def pos(request):
     return render(request, 'dashboard/pos/index.html')
-    if request.method == 'GET':
-        return render(request, 'dashboard/pos/index.html')
+
+@login_required(login_url='login')
+def clientes_index(request):
+    clientes_list = Cliente.objects.all()
+    paginator = Paginator(clientes_list, 10)
+    page_number = request.GET.get('page')
+    clientes = paginator.get_page(page_number)
     
-    #POS
-    return redirect('pos')
+    return render(request, 'dashboard/clientes/index.html', {'clientes': clientes})
+
+@login_required(login_url='login')
+def clientes_crear(request):
+    if request.method == 'POST':
+        cedula = request.POST.get('cedula')
+        nombre = request.POST.get('nombre')
+        apellidos = request.POST.get('apellidos')
+        email = request.POST.get('email', '')
+        telefono = request.POST.get('telefono', '')
+        
+        try:
+            cliente = Cliente.objects.create(
+                cedula=cedula,
+                nombre=nombre,
+                apellidos=apellidos,
+                email=email,
+                telefono=telefono
+            )
+            return redirect('clientes_index')
+        except Exception as e:
+            return render(request, 'dashboard/clientes/crear.html', {
+                'error': str(e)
+            })
+    
+    return render(request, 'dashboard/clientes/crear.html')
+
+@login_required(login_url='login')
+def clientes_editar(request, cliente_id):
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    
+    if request.method == 'POST':
+        cedula = request.POST.get('cedula')
+        nombre = request.POST.get('nombre')
+        apellidos = request.POST.get('apellidos')
+        email = request.POST.get('email', '')
+        telefono = request.POST.get('telefono', '')
+        
+        try:
+            cliente.cedula = cedula
+            cliente.nombre = nombre
+            cliente.apellidos = apellidos
+            cliente.email = email
+            cliente.telefono = telefono
+            cliente.save()
+            
+            return redirect('clientes_index')
+        except Exception as e:
+            return render(request, 'dashboard/clientes/editar.html', {
+                'cliente': cliente,
+                'error': str(e)
+            })
+    
+    return render(request, 'dashboard/clientes/editar.html', {
+        'cliente': cliente
+    })
+
+@login_required(login_url='login')
+def clientes_eliminar(request, cliente_id):
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    
+    if request.method == 'POST':
+        cliente.delete()
+        return redirect('clientes_index')
+    
+    return render(request, 'dashboard/clientes/eliminar.html', {
+        'cliente': cliente
+    })

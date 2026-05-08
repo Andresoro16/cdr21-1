@@ -4,7 +4,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.db import models
-from .models import Orden, Producto
+from .models import Orden, Producto, Cliente
 from .serializers import OrdenSerializer, OrdenReadSerializer
 import json
 
@@ -120,3 +120,85 @@ class ProductoSearchAPIView(View):
             "mensaje": "Productos encontrados",
             "productos": resultado
         })
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ClienteSearchAPIView(View):
+    def get(self, request):
+        cedula = request.GET.get('cedula', '').strip()
+        
+        if not cedula:
+            return JsonResponse({
+                "mensaje": "Debe proporcionar un parámetro 'cedula'",
+                "cliente": None
+            }, status=400)
+        
+        try:
+            cliente = Cliente.objects.get(cedula=cedula)
+            return JsonResponse({
+                "mensaje": "Cliente encontrado",
+                "cliente": {
+                    'id': cliente.id,
+                    'cedula': cliente.cedula,
+                    'nombre': cliente.nombre,
+                    'apellidos': cliente.apellidos,
+                    'email': cliente.email,
+                    'telefono': cliente.telefono,
+                }
+            })
+        except Cliente.DoesNotExist:
+            return JsonResponse({
+                "mensaje": "Cliente no encontrado",
+                "cliente": None
+            }, status=404)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ClienteCreateAPIView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({
+                "mensaje": "Mensaje inválido, debe ser JSON"
+            }, status=400)
+        
+        # Validar campos requeridos
+        cedula = data.get('cedula', '').strip()
+        nombre = data.get('nombre', '').strip()
+        apellidos = data.get('apellidos', '').strip()
+        
+        if not cedula or not nombre or not apellidos:
+            return JsonResponse({
+                "mensaje": "Los campos cedula, nombre y apellidos son requeridos",
+                "errores": {
+                    "cedula": "Requerido" if not cedula else "",
+                    "nombre": "Requerido" if not nombre else "",
+                    "apellidos": "Requerido" if not apellidos else "",
+                }
+            }, status=422)
+        
+        # Verificar si ya existe
+        if Cliente.objects.filter(cedula=cedula).exists():
+            return JsonResponse({
+                "mensaje": "Ya existe un cliente con esta cédula",
+            }, status=422)
+        
+        # Crear cliente
+        cliente = Cliente.objects.create(
+            cedula=cedula,
+            nombre=nombre,
+            apellidos=apellidos,
+            email=data.get('email', ''),
+            telefono=data.get('telefono', '')
+        )
+        
+        return JsonResponse({
+            "mensaje": "Cliente creado exitosamente",
+            "cliente": {
+                'id': cliente.id,
+                'cedula': cliente.cedula,
+                'nombre': cliente.nombre,
+                'apellidos': cliente.apellidos,
+                'email': cliente.email,
+                'telefono': cliente.telefono,
+            }
+        }, status=201)
