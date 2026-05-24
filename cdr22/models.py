@@ -57,8 +57,8 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, related_name='productos')
     
     # Precios
-    precio_costo = models.DecimalField(max_digits=10, decimal_places=2, help_text="Costo para el taller")
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, help_text="Precio al cliente")
+    precio_costo = models.DecimalField(max_digits=15, decimal_places=2, help_text="Costo para el taller")
+    precio_venta = models.DecimalField(max_digits=15, decimal_places=2, help_text="Precio al cliente")
     
     # Stock
     stock = models.PositiveIntegerField(default=0, help_text="Cantidad disponible")
@@ -103,9 +103,9 @@ class Factura(models.Model):
     numero = models.CharField(max_length=50, unique=True, help_text="Número de factura")
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, related_name='facturas')
     
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    impuesto = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Impuesto (IVA, etc.)")
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    subtotal = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    impuesto = models.DecimalField(max_digits=15, decimal_places=2, default=0, help_text="Impuesto (IVA, etc.)")
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     
     metodo_pago = models.CharField(max_length=100, blank=True, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='emitida')
@@ -142,9 +142,9 @@ class Orden(models.Model):
     factura = models.OneToOneField(Factura, on_delete=models.SET_NULL, null=True, blank=True, related_name='orden')
     
     metodo_pago = models.CharField(max_length=100)
-    subtotal = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    impuesto = models.DecimalField(decimal_places=2, max_digits=10, default=0)
-    precio_total = models.DecimalField(decimal_places=2, max_digits=10)
+    subtotal = models.DecimalField(decimal_places=2, max_digits=15, default=0)
+    impuesto = models.DecimalField(decimal_places=2, max_digits=15, default=0)
+    precio_total = models.DecimalField(decimal_places=2, max_digits=15)
     
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
     
@@ -162,7 +162,7 @@ class Orden(models.Model):
 class OrdenItem(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items')  # ← Relación FK
     detalle = models.CharField(max_length=150)
-    precio = models.DecimalField(decimal_places=2, max_digits=10)  # ← Cambié de SmallIntegerField
+    precio = models.DecimalField(decimal_places=2, max_digits=15)  # ← Cambié de SmallIntegerField
     cantidad = models.PositiveIntegerField()  # ← PositiveIntegerField es mejor
     created_at = models.DateTimeField(auto_now_add=True)
     

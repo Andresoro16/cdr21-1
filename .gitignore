@@ -11,3 +11,6 @@ db.sqlite3
 .idea/
 
 theme/static/css/dist/
+
+# Tests
+tests_e2e/

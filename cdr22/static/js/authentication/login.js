@@ -6,7 +6,7 @@ form.addEventListener('submit', function(event){
     const password = document.getElementById('password').value;
     login(user, password)
     .then(response => {
-        window.location.href = '/dashboard/';
+        window.location.href = '/dashboard/home';
     })
     .catch(async(response)=>{
         const data = await response.json();

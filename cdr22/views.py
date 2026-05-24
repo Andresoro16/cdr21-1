@@ -8,7 +8,7 @@ from cdr22.models import Producto, Categoria, Cliente
 import json
 
 def principal (request):
-    return render(request, 'dashboard/principal.html')
+    return render(request, 'landing.html')
 
 """ Auth Views """
 def login_view(request):
