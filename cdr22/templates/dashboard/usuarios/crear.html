@@ -1,0 +1,108 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Crear Usuario {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Crear Usuario" descripcion="Registre un usuario, asígnele un rol y defina cómo configurará su contraseña" %}
+
+    <form method="POST" class="dashboard-card p-8">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.first_name.id_for_label }}">Nombre *</label>
+                <input type="text" name="first_name" id="{{ form.first_name.id_for_label }}" value="{{ form.first_name.value|default:'' }}" class="formulario_input" required>
+                {% if form.first_name.errors %}<p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.last_name.id_for_label }}">Apellido</label>
+                <input type="text" name="last_name" id="{{ form.last_name.id_for_label }}" value="{{ form.last_name.value|default:'' }}" class="formulario_input">
+                {% if form.last_name.errors %}<p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.username.id_for_label }}">Usuario *</label>
+                <input type="text" name="username" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}" class="formulario_input" required>
+                {% if form.username.errors %}<p class="mt-2 text-sm text-red-600">{{ form.username.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.email.id_for_label }}">Correo electrónico *</label>
+                <input type="email" name="email" id="{{ form.email.id_for_label }}" value="{{ form.email.value|default:'' }}" class="formulario_input" required>
+                {% if form.email.errors %}<p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.role.id_for_label }}">Rol *</label>
+                <select name="role" id="{{ form.role.id_for_label }}" class="formulario_input" required>
+                    <option value="">-- Seleccione un rol --</option>
+                    {% for role in form.fields.role.queryset %}
+                        <option value="{{ role.id }}" {% if form.role.value|stringformat:"s" == role.id|stringformat:"s" %}selected{% endif %}>{{ role.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.role.errors %}<p class="mt-2 text-sm text-red-600">{{ form.role.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.password_mode.id_for_label }}">Contraseña *</label>
+                <select name="password_mode" id="{{ form.password_mode.id_for_label }}" class="formulario_input" required>
+                    {% for value, label in form.fields.password_mode.choices %}
+                        <option value="{{ value }}" {% if form.password_mode.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.password_mode.errors %}<p class="mt-2 text-sm text-red-600">{{ form.password_mode.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col password-field">
+                <label class="formulario_label mb-2" for="{{ form.password1.id_for_label }}">Contraseña</label>
+                <input type="password" name="password1" id="{{ form.password1.id_for_label }}" class="formulario_input">
+                {% if form.password1.errors %}<p class="mt-2 text-sm text-red-600">{{ form.password1.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col password-field">
+                <label class="formulario_label mb-2" for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+                <input type="password" name="password2" id="{{ form.password2.id_for_label }}" class="formulario_input">
+                {% if form.password2.errors %}<p class="mt-2 text-sm text-red-600">{{ form.password2.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+
+        <label class="mb-8 flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %}>
+            Usuario activo
+        </label>
+
+        <div class="flex gap-4">
+            <button type="submit" class="btn btn-md btn-success">
+                Crear Usuario
+            </button>
+            <a href="{% url 'usuarios_index' %}" class="btn btn-md btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const passwordMode = document.getElementById('{{ form.password_mode.id_for_label }}');
+    const passwordFields = document.querySelectorAll('.password-field');
+
+    function togglePasswordFields() {
+        const showPasswordFields = passwordMode.value === 'manual';
+        passwordFields.forEach((field) => {
+            field.classList.toggle('hidden', !showPasswordFields);
+        });
+    }
+
+    passwordMode.addEventListener('change', togglePasswordFields);
+    togglePasswordFields();
+</script>
+{% endblock contenido %}

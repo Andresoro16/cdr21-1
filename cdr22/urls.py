@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetConfirmView
+from django.urls import reverse_lazy
 
 """ path = '' """
 urlpatterns =[
@@ -8,6 +9,14 @@ urlpatterns =[
     path ('login', views.login_view, name='login'),
     path ('logout', LogoutView.as_view(next_page='login'), name='logout'),
     path ('olvide-password', views.olvidePassword, name='olvide-password'),
+    path(
+        'password-reset/confirm/<uidb64>/<token>/',
+        PasswordResetConfirmView.as_view(
+            template_name='registration/password_reset_confirm.html',
+            success_url=reverse_lazy('login')
+        ),
+        name='password_reset_confirm'
+    ),
     path ('testing', views.testing, name="testing"),
     path ('login-django', LoginView.as_view(template_name='login.html'), name='logindjango'),
     
@@ -24,6 +33,9 @@ urlpatterns =[
     path('dashboard/clientes/crear/', views.clientes_crear, name='clientes_crear'),
     path('dashboard/clientes/editar/<int:cliente_id>/', views.clientes_editar, name='clientes_editar'),
     path('dashboard/clientes/eliminar/<int:cliente_id>/', views.clientes_eliminar, name='clientes_eliminar'),
+
+    path('dashboard/usuarios/', views.usuarios_index, name='usuarios_index'),
+    path('dashboard/usuarios/crear/', views.usuarios_crear, name='usuarios_crear'),
 
     path('dashboard/compras/', views.compras_index, name='compras_index'),
     path('dashboard/compras/<int:compra_id>/', views.compras_detalle, name='compras_detalle'),

@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import Group, User
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
+import secrets
+from cdr22.forms import UsuarioCreateForm
 from cdr22.models import Producto, Categoria, Cliente, Compra, Orden, Proveedor
+from cdr22.roles import ROLE_NAMES, USER_MANAGER_ROLES
 from cdr22.serializers import CompraCreateSerializer
 from cdr22.services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
@@ -38,6 +43,25 @@ def _compra_payload_from_post(post_data):
         'observaciones': post_data.get('observaciones', '').strip(),
         'items': items,
     }
+
+def _can_manage_users(user):
+    return user.is_authenticated and (
+        user.is_superuser or user.groups.filter(name__in=USER_MANAGER_ROLES).exists()
+    )
+
+def _ensure_roles():
+    for role_name in ROLE_NAMES:
+        Group.objects.get_or_create(name=role_name)
+
+def _send_password_setup_email(request, user):
+    reset_form = PasswordResetForm({'email': user.email})
+    if reset_form.is_valid():
+        reset_form.save(
+            request=request,
+            use_https=request.is_secure(),
+            email_template_name='registration/password_setup_email.html',
+            subject_template_name='registration/password_setup_subject.txt',
+        )
 
 def principal (request):
     return render(request, 'landing.html')
@@ -290,6 +314,58 @@ def clientes_eliminar(request, cliente_id):
     return render(request, 'dashboard/clientes/eliminar.html', {
         'cliente': cliente
     })
+
+@login_required(login_url='login')
+def usuarios_index(request):
+    if not _can_manage_users(request.user):
+        messages.error(request, 'No tienes permisos para gestionar usuarios.')
+        return redirect('home')
+
+    usuarios_list = User.objects.prefetch_related('groups').order_by('username')
+    paginator = Paginator(usuarios_list, 10)
+    page_number = request.GET.get('page')
+    usuarios = paginator.get_page(page_number)
+
+    return render(request, 'dashboard/usuarios/index.html', {'usuarios': usuarios})
+
+@login_required(login_url='login')
+def usuarios_crear(request):
+    if not _can_manage_users(request.user):
+        messages.error(request, 'No tienes permisos para gestionar usuarios.')
+        return redirect('home')
+
+    _ensure_roles()
+
+    if request.method == 'POST':
+        form = UsuarioCreateForm(request.POST)
+        if form.is_valid():
+            user = User(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                is_active=form.cleaned_data['is_active'],
+            )
+
+            if form.cleaned_data['password_mode'] == 'manual':
+                user.set_password(form.cleaned_data['password1'])
+            else:
+                user.set_password(secrets.token_urlsafe(24))
+
+            user.save()
+            user.groups.set([form.cleaned_data['role']])
+
+            if form.cleaned_data['password_mode'] == 'email':
+                _send_password_setup_email(request, user)
+                messages.success(request, 'Usuario creado. Se generó el correo para configurar contraseña.')
+            else:
+                messages.success(request, 'Usuario creado correctamente.')
+
+            return redirect('usuarios_index')
+    else:
+        form = UsuarioCreateForm(initial={'password_mode': 'email', 'is_active': True})
+
+    return render(request, 'dashboard/usuarios/crear.html', {'form': form})
 
 @login_required(login_url='login')
 def compras_index(request):

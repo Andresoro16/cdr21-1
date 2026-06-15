@@ -1,0 +1,80 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Usuarios {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Gestión de Usuarios" descripcion="Administre usuarios, roles y acceso al sistema" %}
+
+    <div class="flex justify-end mb-6">
+        <a href="{% url 'usuarios_crear' %}" class="btn btn-md btn-success">
+            + Crear Usuario
+        </a>
+    </div>
+
+    <div class="data-table-wrapper-tall">
+        <table class="data-table">
+            <thead class="data-table-head">
+                <tr>
+                    <th class="table-header">Usuario</th>
+                    <th class="table-header">Nombre</th>
+                    <th class="table-header">Correo</th>
+                    <th class="table-header">Rol</th>
+                    <th class="table-header">Estado</th>
+                    <th class="table-header">Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios.object_list %}
+                    <tr class="data-table-row">
+                        <td class="table-data font-mono">{{ usuario.username }}</td>
+                        <td class="table-data font-medium">
+                            {{ usuario.first_name|default:usuario.username }} {{ usuario.last_name }}
+                        </td>
+                        <td class="table-data">{{ usuario.email|default:"-" }}</td>
+                        <td class="table-data">
+                            {% for group in usuario.groups.all %}
+                                <span class="status-badge status-badge-muted">{{ group.name }}</span>
+                            {% empty %}
+                                <span class="text-gray-400">Sin rol</span>
+                            {% endfor %}
+                        </td>
+                        <td class="table-data">
+                            {% if usuario.is_active %}
+                                <span class="status-badge status-badge-success">Activo</span>
+                            {% else %}
+                                <span class="status-badge status-badge-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-data">
+                            {% if usuario.is_superuser %}
+                                <span class="status-badge status-badge-warning">Superusuario</span>
+                            {% elif usuario.is_staff %}
+                                <span class="status-badge status-badge-muted">Staff</span>
+                            {% else %}
+                                <span class="text-gray-500">Usuario</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-state-cell">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👤</div>
+                                <p class="empty-state-title">No hay usuarios registrados</p>
+                                <p class="empty-state-description">Cree usuarios y asígneles un rol para operar el sistema</p>
+                                <a href="{% url 'usuarios_crear' %}" class="mt-4 btn btn-md btn-success">
+                                    + Crear Primer Usuario
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'components/pagination.html' with pagina=usuarios %}
+</div>
+{% endblock contenido %}
