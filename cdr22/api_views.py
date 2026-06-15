@@ -4,8 +4,10 @@ from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.db import models, transaction
-from .models import Orden, Producto, Cliente
-from .serializers import OrdenSerializer, OrdenReadSerializer
+from .api_responses import error_response, success_response, validation_error_response
+from .models import Compra, Orden, Producto, Cliente
+from .serializers import CompraCreateSerializer, CompraReadSerializer, OrdenSerializer, OrdenReadSerializer
+from .services.compras import crear_compra
 import json
 
 # class Authentication: 
@@ -361,3 +363,31 @@ class OrdenCreateAPIView(View):
             return JsonResponse({
                 "mensaje": f"Error al crear la orden: {str(e)}"
             }, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ComprasAPIView(View):
+    def get(self, request):
+        compras = Compra.objects.select_related('proveedor').all()
+        serializer = CompraReadSerializer(compras, many=True)
+        return success_response(
+            "Compras obtenidas con éxito",
+            data={"compras": serializer.data}
+        )
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return error_response("Mensaje inválido, debe ser JSON", status=400)
+
+        serializer = CompraCreateSerializer(data=data)
+        if not serializer.is_valid():
+            return validation_error_response(serializer.errors)
+
+        compra = crear_compra(serializer.validated_data)
+        read_serializer = CompraReadSerializer(compra)
+        return success_response(
+            "Compra creada exitosamente",
+            data={"compra": read_serializer.data},
+            status=201
+        )

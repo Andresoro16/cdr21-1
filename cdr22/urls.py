@@ -22,5 +22,7 @@ urlpatterns =[
     path('dashboard/clientes/editar/<int:cliente_id>/', views.clientes_editar, name='clientes_editar'),
     path('dashboard/clientes/eliminar/<int:cliente_id>/', views.clientes_eliminar, name='clientes_eliminar'),
 
-]
+    path('dashboard/compras/', views.compras_index, name='compras_index'),
+    path('dashboard/compras/crear/', views.compras_crear, name='compras_crear'),
 
+]

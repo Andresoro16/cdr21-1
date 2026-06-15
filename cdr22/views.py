@@ -4,8 +4,39 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from cdr22.models import Producto, Categoria, Cliente
+from cdr22.models import Producto, Categoria, Cliente, Compra, Proveedor
+from cdr22.serializers import CompraCreateSerializer
+from cdr22.services.compras import crear_compra
 import json
+
+
+def _compra_payload_from_post(post_data):
+    items = []
+    producto_ids = post_data.getlist('producto')
+    cantidades = post_data.getlist('cantidad')
+    costos = post_data.getlist('costo_unitario')
+
+    for producto_id, cantidad, costo_unitario in zip(producto_ids, cantidades, costos):
+        if not producto_id:
+            continue
+
+        items.append({
+            'producto_id': producto_id,
+            'cantidad': cantidad,
+            'costo_unitario': costo_unitario,
+        })
+
+    return {
+        'proveedor_id': post_data.get('proveedor') or None,
+        'proveedor_nombre': post_data.get('proveedor_nombre', '').strip(),
+        'numero_factura': post_data.get('numero_factura', '').strip(),
+        'fecha_compra': post_data.get('fecha_compra'),
+        'estado': post_data.get('estado', 'borrador'),
+        'metodo_pago': post_data.get('metodo_pago', ''),
+        'impuesto': post_data.get('impuesto') or '0',
+        'observaciones': post_data.get('observaciones', '').strip(),
+        'items': items,
+    }
 
 def principal (request):
     return render(request, 'landing.html')
@@ -239,4 +270,38 @@ def clientes_eliminar(request, cliente_id):
     
     return render(request, 'dashboard/clientes/eliminar.html', {
         'cliente': cliente
+    })
+
+@login_required(login_url='login')
+def compras_index(request):
+    compras_list = Compra.objects.select_related('proveedor').prefetch_related('items').all()
+    paginator = Paginator(compras_list, 10)
+    page_number = request.GET.get('page')
+    compras = paginator.get_page(page_number)
+
+    return render(request, 'dashboard/compras/index.html', {'compras': compras})
+
+@login_required(login_url='login')
+def compras_crear(request):
+    productos = Producto.objects.filter(estado='activo').order_by('nombre')
+    proveedores = Proveedor.objects.all()
+
+    if request.method == 'POST':
+        payload = _compra_payload_from_post(request.POST)
+        serializer = CompraCreateSerializer(data=payload)
+
+        if serializer.is_valid():
+            crear_compra(serializer.validated_data)
+            return redirect('compras_index')
+
+        return render(request, 'dashboard/compras/crear.html', {
+            'productos': productos,
+            'proveedores': proveedores,
+            'error': 'Hay errores en el formulario',
+            'form_errors': serializer.errors,
+        })
+
+    return render(request, 'dashboard/compras/crear.html', {
+        'productos': productos,
+        'proveedores': proveedores,
     })

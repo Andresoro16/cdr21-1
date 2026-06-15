@@ -9,4 +9,5 @@ urlpatterns = [
     path('clientes/search/', api_views.ClienteSearchAPIView.as_view(), name='api.clientes.search'),
     path('clientes/create/', api_views.ClienteCreateAPIView.as_view(), name='api.clientes.create'),
     path('ordenes/create/', api_views.OrdenCreateAPIView.as_view(), name='api.ordenes.create'),
+    path('compras/', api_views.ComprasAPIView.as_view(), name='api.compras'),
 ]

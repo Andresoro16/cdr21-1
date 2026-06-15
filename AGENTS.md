@@ -102,6 +102,7 @@ python manage.py tailwind build
 - Leer la estructura existente antes de editar.
 - Mantener los cambios acotados a la tarea.
 - No hacer refactors no solicitados.
+- Para endpoints `POST`, `PUT`, `PATCH` y `DELETE`, seguir el patrón de serializers + services + respuestas JSON estándar descrito en `docs/api-pattern.md`.
 - No tocar `venv/`, `__pycache__/`, `.pytest_cache/`, screenshots generados o archivos compilados si no es necesario.
 - No agregar nuevas dependencias sin justificarlo y confirmarlo.
 - Seguir el estilo actual de templates, vistas y rutas.

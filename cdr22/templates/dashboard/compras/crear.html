@@ -1,0 +1,213 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Crear Compra {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-7xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Crear Compra" descripcion="Registre productos comprados y defina si el stock ya debe ingresar al inventario" %}
+
+    {% if error %}
+        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            {{ error }}
+            {% if form_errors %}
+                <ul class="mt-2 list-disc pl-5 text-sm">
+                    {% for campo, errores in form_errors.items %}
+                        <li><strong>{{ campo }}:</strong> {{ errores }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <form method="POST" class="bg-white rounded-lg shadow p-8" id="compra-form">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="proveedor">Proveedor existente</label>
+                <select id="proveedor" name="proveedor" class="formulario_input">
+                    <option value="">-- Sin proveedor existente --</option>
+                    {% for proveedor in proveedores %}
+                        <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="proveedor_nombre">Nuevo proveedor</label>
+                <input type="text" id="proveedor_nombre" name="proveedor_nombre" placeholder="Nombre del proveedor" class="formulario_input">
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="numero_factura">Número de factura</label>
+                <input type="text" id="numero_factura" name="numero_factura" placeholder="Ej: FV-00123" class="formulario_input">
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="fecha_compra">Fecha de compra *</label>
+                <input type="date" id="fecha_compra" name="fecha_compra" class="formulario_input" required>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="estado">Estado *</label>
+                <select id="estado" name="estado" class="formulario_input" required>
+                    <option value="borrador">Borrador</option>
+                    <option value="en_espera">En espera</option>
+                    <option value="completada">Completada</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="metodo_pago">Método de pago</label>
+                <select id="metodo_pago" name="metodo_pago" class="formulario_input">
+                    <option value="">-- Seleccione --</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="credito">Crédito</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold">Productos comprados</h2>
+                <button type="button" id="agregar-item" class="formulario_boton formulario_boton_azul">
+                    + Agregar producto
+                </button>
+            </div>
+
+            <div class="overflow-x-auto border rounded-lg">
+                <table class="w-full" id="items-table">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="table-header">Producto</th>
+                            <th class="table-header">Cantidad</th>
+                            <th class="table-header">Costo unitario</th>
+                            <th class="table-header">Subtotal</th>
+                            <th class="table-header">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-body">
+                        <tr class="compra-item-row border-b">
+                            <td class="table-data min-w-64">
+                                <select name="producto" class="formulario_input producto-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    {% for producto in productos %}
+                                        <option value="{{ producto.id }}">{{ producto.nombre }} - {{ producto.sku }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="table-data">
+                                <input type="number" name="cantidad" min="1" value="1" class="formulario_input cantidad-input" required>
+                            </td>
+                            <td class="table-data">
+                                <input type="number" name="costo_unitario" min="0.01" step="0.01" value="0.00" class="formulario_input costo-input" required>
+                            </td>
+                            <td class="table-data font-semibold item-subtotal">$0.00</td>
+                            <td class="table-data">
+                                <button type="button" class="remover-item px-3 py-2 rounded bg-red-100 text-red-700 hover:bg-red-200">
+                                    Quitar
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="observaciones">Observaciones</label>
+                <textarea id="observaciones" name="observaciones" class="formulario_input" rows="5" placeholder="Notas de la compra"></textarea>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-6 flex flex-col gap-4">
+                <div class="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <strong id="subtotal-text">$0.00</strong>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                    <label class="formulario_label" for="impuesto">Impuesto</label>
+                    <input type="number" id="impuesto" name="impuesto" min="0" step="0.01" value="0.00" class="formulario_input max-w-48">
+                </div>
+                <div class="flex justify-between text-lg border-t pt-4">
+                    <span>Total</span>
+                    <strong id="total-text">$0.00</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="formulario_boton formulario_boton_verde">
+                Crear Compra
+            </button>
+            <a href="{% url 'compras_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const itemsBody = document.getElementById('items-body');
+    const agregarItem = document.getElementById('agregar-item');
+    const impuestoInput = document.getElementById('impuesto');
+    const subtotalText = document.getElementById('subtotal-text');
+    const totalText = document.getElementById('total-text');
+
+    function formatoMoneda(valor) {
+        return `$${valor.toFixed(2)}`;
+    }
+
+    function actualizarTotales() {
+        let subtotal = 0;
+
+        document.querySelectorAll('.compra-item-row').forEach((row) => {
+            const cantidad = Number(row.querySelector('.cantidad-input').value || 0);
+            const costo = Number(row.querySelector('.costo-input').value || 0);
+            const itemSubtotal = cantidad * costo;
+            row.querySelector('.item-subtotal').textContent = formatoMoneda(itemSubtotal);
+            subtotal += itemSubtotal;
+        });
+
+        const impuesto = Number(impuestoInput.value || 0);
+        subtotalText.textContent = formatoMoneda(subtotal);
+        totalText.textContent = formatoMoneda(subtotal + impuesto);
+    }
+
+    function enlazarFila(row) {
+        row.querySelectorAll('input, select').forEach((input) => {
+            input.addEventListener('input', actualizarTotales);
+            input.addEventListener('change', actualizarTotales);
+        });
+
+        row.querySelector('.remover-item').addEventListener('click', () => {
+            if (document.querySelectorAll('.compra-item-row').length > 1) {
+                row.remove();
+                actualizarTotales();
+            }
+        });
+    }
+
+    agregarItem.addEventListener('click', () => {
+        const primeraFila = document.querySelector('.compra-item-row');
+        const nuevaFila = primeraFila.cloneNode(true);
+
+        nuevaFila.querySelector('.producto-select').value = '';
+        nuevaFila.querySelector('.cantidad-input').value = '1';
+        nuevaFila.querySelector('.costo-input').value = '0.00';
+        nuevaFila.querySelector('.item-subtotal').textContent = '$0.00';
+
+        itemsBody.appendChild(nuevaFila);
+        enlazarFila(nuevaFila);
+        actualizarTotales();
+    });
+
+    impuestoInput.addEventListener('input', actualizarTotales);
+    document.querySelectorAll('.compra-item-row').forEach(enlazarFila);
+    actualizarTotales();
+</script>
+{% endblock contenido %}
