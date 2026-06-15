@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.db import models
+from django.db import models, transaction
 from .models import Orden, Producto, Cliente
 from .serializers import OrdenSerializer, OrdenReadSerializer
 import json
@@ -254,33 +254,8 @@ class OrdenCreateAPIView(View):
                     "mensaje": "La orden debe contener al menos un artículo"
                 }, status=400)
             
-            # Crear factura
-            from .models import Factura
-            factura_numero = f"FAC-{Factura.objects.count() + 1:06d}"
-            
-            factura = Factura.objects.create(
-                numero=factura_numero,
-                cliente=cliente,
-                subtotal=subtotal,
-                impuesto=impuesto,
-                total=total,
-                metodo_pago=metodo_pago,
-                estado='emitida'
-            )
-            
-            # Crear orden
-            orden = Orden.objects.create(
-                cliente=cliente,
-                factura=factura,
-                metodo_pago=metodo_pago,
-                subtotal=subtotal,
-                impuesto=impuesto,
-                precio_total=total,
-                estado='completada'
-            )
-            
-            # Crear items de la orden
-            from .models import OrdenItem
+            productos_validados = []
+
             for item in items:
                 # Buscar por 'id' (como lo envía el carrito del POS)
                 producto_id = item.get('id') or item.get('producto_id')
@@ -296,17 +271,69 @@ class OrdenCreateAPIView(View):
                     return JsonResponse({
                         "mensaje": f"Producto con id {producto_id} no existe"
                     }, status=404)
-                
-                OrdenItem.objects.create(
-                    orden=orden,
-                    detalle=producto.nombre,
-                    precio=float(item.get('precio_unitario', 0)),
-                    cantidad=int(item.get('cantidad', 1))
+
+                cantidad = int(item.get('cantidad', 1))
+
+                if producto.stock < cantidad:
+                    return JsonResponse({
+                        "mensaje": "Stock insuficiente",
+                        "errores": {
+                            "producto_id": producto.id,
+                            "producto": producto.nombre,
+                            "stock_disponible": producto.stock,
+                            "cantidad_solicitada": cantidad,
+                            "detalle": f"No hay suficiente stock para {producto.nombre}. Disponible: {producto.stock}, solicitado: {cantidad}."
+                        }
+                    }, status=422)
+
+                productos_validados.append({
+                    "producto": producto,
+                    "cantidad": cantidad,
+                    "precio_unitario": float(item.get('precio_unitario', 0)),
+                })
+
+            from .models import Factura, OrdenItem
+
+            with transaction.atomic():
+                # Crear factura
+                factura_numero = f"FAC-{Factura.objects.count() + 1:06d}"
+
+                factura = Factura.objects.create(
+                    numero=factura_numero,
+                    cliente=cliente,
+                    subtotal=subtotal,
+                    impuesto=impuesto,
+                    total=total,
+                    metodo_pago=metodo_pago,
+                    estado='emitida'
                 )
+
+                # Crear orden
+                orden = Orden.objects.create(
+                    cliente=cliente,
+                    factura=factura,
+                    metodo_pago=metodo_pago,
+                    subtotal=subtotal,
+                    impuesto=impuesto,
+                    precio_total=total,
+                    estado='completada'
+                )
+
+                # Crear items de la orden
+                for item_validado in productos_validados:
+                    producto = item_validado["producto"]
+                    cantidad = item_validado["cantidad"]
                 
-                # Actualizar stock del producto
-                producto.stock -= int(item.get('cantidad', 1))
-                producto.save()
+                    OrdenItem.objects.create(
+                        orden=orden,
+                        detalle=producto.nombre,
+                        precio=item_validado["precio_unitario"],
+                        cantidad=cantidad
+                    )
+
+                    # Actualizar stock del producto
+                    producto.stock -= cantidad
+                    producto.save()
             
             return JsonResponse({
                 "mensaje": "Orden creada exitosamente",
