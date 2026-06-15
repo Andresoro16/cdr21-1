@@ -1,5 +1,6 @@
 {% extends 'autenticado.html' %}
 {% load static %}
+{% load formatters %}
 
 {% block header_title %} Eliminar Producto {% endblock header_title %}
 
@@ -51,7 +52,7 @@
                 </div>
                 <div>
                     <span class="text-sm font-medium text-gray-600">Precio Venta:</span>
-                    <p class="text-sm font-semibold text-green-600">${{ producto.precio_venta }}</p>
+                    <p class="text-sm font-semibold text-green-600">{{ producto.precio_venta|money }}</p>
                 </div>
                 <div>
                     <span class="text-sm font-medium text-gray-600">Estado:</span>

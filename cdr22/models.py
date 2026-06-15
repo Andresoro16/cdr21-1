@@ -169,6 +169,10 @@ class OrdenItem(models.Model):
     
     class Meta:
         db_table = 'orden_items'
+
+    @property
+    def subtotal(self):
+        return self.precio * self.cantidad
     
     def __str__(self):
         return f"{self.detalle} - Orden #{self.orden.id}"

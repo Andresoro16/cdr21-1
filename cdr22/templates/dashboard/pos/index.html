@@ -235,7 +235,7 @@
                             <p class="font-medium">${producto.nombre}</p>
                             <p class="text-sm text-gray-600">SKU: ${producto.sku} | Stock: ${producto.stock}</p>
                         </div>
-                        <span class="font-semibold text-green-600">$${producto.precio_venta}</span>
+                        <span class="font-semibold text-green-600">${Formatters.money(producto.precio_venta)}</span>
                     </div>
                 `;
                 li.addEventListener('click', () => agregarAlCarrito(producto));
@@ -295,7 +295,7 @@
                 <tr class="border-b hover:bg-gray-50">
                     <td class="table-data">${item.sku}</td>
                     <td class="table-data">${item.nombre}</td>
-                    <td class="table-data">$${item.precio_unitario}</td>
+                    <td class="table-data">${Formatters.money(item.precio_unitario)}</td>
                     <td class="table-data">
                         <input 
                             type="number" 
@@ -305,7 +305,7 @@
                             onchange="actualizarCantidad(${index}, this.value)"
                         >
                     </td>
-                    <td class="table-data">$${subtotal.toFixed(2)}</td>
+                    <td class="table-data">${Formatters.money(subtotal)}</td>
                     <td class="table-data text-center">
                         <button onclick="eliminarDelCarrito(${index})" class="px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors text-xs font-medium">
                             Eliminar
@@ -336,9 +336,9 @@
         const impuesto = subtotal * 0.00; // 0% por ahora
         const total = subtotal + impuesto;
 
-        document.getElementById('total_subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('total_impuesto').textContent = `$${impuesto.toFixed(2)}`;
-        document.getElementById('total_final').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('total_subtotal').textContent = Formatters.money(subtotal);
+        document.getElementById('total_impuesto').textContent = Formatters.money(impuesto);
+        document.getElementById('total_final').textContent = Formatters.money(total);
     }
 
     // Completar venta
@@ -394,7 +394,7 @@
 
             if (response.ok) {
                 // Éxito
-                Notify.success(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: $${data.orden.total}`);
+                Notify.success(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: ${Formatters.money(data.orden.total)}`);
                 
                 // Limpiar formulario
                 limpiarCliente();

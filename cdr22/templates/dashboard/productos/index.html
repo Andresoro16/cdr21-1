@@ -1,5 +1,6 @@
 {% extends 'autenticado.html' %}
 {% load static %}
+{% load formatters %}
 
 {% block header_title %} Productos {% endblock header_title %}
 
@@ -42,7 +43,7 @@
                         {% endif %}
                     </td>
                     <td class="table-data">{{ producto.marca }}</td>
-                    <td class="table-data font-semibold text-green-600">${{ producto.precio_venta }}</td>
+                    <td class="table-data font-semibold text-green-600">{{ producto.precio_venta|money }}</td>
                     <td class="table-data">
                         <span class="{% if producto.stock <= producto.stock_minimo %}text-red-600 font-semibold{% endif %}">
                             {{ producto.stock }}

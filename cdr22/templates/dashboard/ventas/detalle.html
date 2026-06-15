@@ -1,0 +1,127 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+{% load formatters %}
+
+{% block header_title %} Detalle de Venta {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+            <a href="{% url 'ventas_index' %}" class="link-text">← Volver a ventas</a>
+            <h1 class="mt-2 detail-title">Venta #{{ venta.id }}</h1>
+            <p class="section-description">Detalle de la venta y productos facturados</p>
+        </div>
+
+        <span class="status-badge-lg
+            {% if venta.estado == 'completada' %}status-badge-success
+            {% elif venta.estado == 'pendiente' %}status-badge-warning
+            {% else %}status-badge-danger{% endif %}">
+            {{ venta.get_estado_display }}
+        </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="summary-card">
+            <p class="summary-label">Factura</p>
+            <p class="summary-value">
+                {% if venta.factura %}{{ venta.factura.numero }}{% else %}-{% endif %}
+            </p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-label">Fecha</p>
+            <p class="summary-value">{{ venta.created_at|date:"Y-m-d H:i" }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-label">Método de pago</p>
+            <p class="summary-value">{{ venta.metodo_pago|default:"-" }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-label">Total</p>
+            <p class="summary-value text-green-700">{{ venta.precio_total|money }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <section class="lg:col-span-2 dashboard-card">
+            <div class="dashboard-card-header">
+                <h2 class="section-title">Productos vendidos</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="table-header">Detalle</th>
+                            <th class="table-header">Cantidad</th>
+                            <th class="table-header">Precio unitario</th>
+                            <th class="table-header">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in venta.items.all %}
+                            <tr class="data-table-row">
+                                <td class="table-data font-medium">{{ item.detalle }}</td>
+                                <td class="table-data">{{ item.cantidad }}</td>
+                                <td class="table-data">{{ item.precio|money }}</td>
+                                <td class="table-data font-semibold">{{ item.subtotal|money }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-state-cell">
+                                    <div class="empty-state">
+                                        <p class="empty-state-title">Esta venta no tiene productos registrados</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="dashboard-card dashboard-card-body h-max">
+            <h2 class="section-title mb-4">Cliente</h2>
+            {% if venta.cliente %}
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="summary-label">Nombre</p>
+                        <p class="font-semibold">{{ venta.cliente.nombre }} {{ venta.cliente.apellidos }}</p>
+                    </div>
+                    <div>
+                        <p class="summary-label">Cédula</p>
+                        <p>{{ venta.cliente.cedula }}</p>
+                    </div>
+                    <div>
+                        <p class="summary-label">Email</p>
+                        <p>{{ venta.cliente.email|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <p class="summary-label">Teléfono</p>
+                        <p>{{ venta.cliente.telefono|default:"-" }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-sm text-gray-500">Sin cliente asociado</p>
+            {% endif %}
+        </aside>
+    </div>
+
+    <section class="dashboard-card dashboard-card-body">
+        <h2 class="section-title mb-4">Resumen</h2>
+        <div class="max-w-md space-y-3 text-sm">
+            <div class="flex justify-between">
+                <span class="text-gray-500">Subtotal</span>
+                <strong>{{ venta.subtotal|money }}</strong>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Impuesto</span>
+                <strong>{{ venta.impuesto|money }}</strong>
+            </div>
+            <div class="flex justify-between border-t pt-3 text-base">
+                <span>Total</span>
+                <strong class="text-green-700">{{ venta.precio_total|money }}</strong>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock contenido %}

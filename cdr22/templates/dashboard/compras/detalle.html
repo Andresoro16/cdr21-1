@@ -1,5 +1,6 @@
 {% extends 'autenticado.html' %}
 {% load static %}
+{% load formatters %}
 
 {% block header_title %} Detalle de Compra {% endblock header_title %}
 
@@ -70,8 +71,8 @@
                                 <td class="table-data font-medium">{{ item.producto.nombre }}</td>
                                 <td class="table-data font-mono">{{ item.producto.sku }}</td>
                                 <td class="table-data">{{ item.cantidad }}</td>
-                                <td class="table-data">${{ item.costo_unitario }}</td>
-                                <td class="table-data font-semibold">${{ item.subtotal }}</td>
+                                <td class="table-data">{{ item.costo_unitario|money }}</td>
+                                <td class="table-data font-semibold">{{ item.subtotal|money }}</td>
                                 <td class="table-data">{{ item.producto.stock }}</td>
                             </tr>
                         {% endfor %}
@@ -89,15 +90,15 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500">Subtotal</span>
-                    <strong>${{ compra.subtotal }}</strong>
+                    <strong>{{ compra.subtotal|money }}</strong>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500">Impuesto</span>
-                    <strong>${{ compra.impuesto }}</strong>
+                    <strong>{{ compra.impuesto|money }}</strong>
                 </div>
                 <div class="flex justify-between border-t pt-3 text-base">
                     <span>Total</span>
-                    <strong class="text-green-700">${{ compra.total }}</strong>
+                    <strong class="text-green-700">{{ compra.total|money }}</strong>
                 </div>
             </div>
         </aside>

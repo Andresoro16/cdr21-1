@@ -1,5 +1,6 @@
 {% extends 'autenticado.html' %}
 {% load static %}
+{% load formatters %}
 
 {% block header_title %} Lista de Ventas {% endblock header_title %}
 
@@ -24,6 +25,7 @@
                     <th class="table-header">Método de pago</th>
                     <th class="table-header">Total</th>
                     <th class="table-header">Estado</th>
+                    <th class="table-header">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +49,7 @@
                         </td>
                         <td class="table-data">{{ venta.items.count }}</td>
                         <td class="table-data">{{ venta.metodo_pago|default:"-" }}</td>
-                        <td class="table-data font-semibold text-green-600">${{ venta.precio_total }}</td>
+                        <td class="table-data font-semibold text-green-600">{{ venta.precio_total|money }}</td>
                         <td class="table-data">
                             <span class="status-badge
                                 {% if venta.estado == 'completada' %}status-badge-success
@@ -56,10 +58,15 @@
                                 {{ venta.get_estado_display }}
                             </span>
                         </td>
+                        <td class="table-data">
+                            <a href="{% url 'ventas_detalle' venta.id %}" class="btn btn-sm btn-primary">
+                                Ver
+                            </a>
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="7" class="empty-state-cell">
+                        <td colspan="8" class="empty-state-cell">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🧾</div>
                                 <p class="empty-state-title">No hay ventas registradas</p>

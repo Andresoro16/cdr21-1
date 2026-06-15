@@ -1,5 +1,6 @@
 {% extends 'autenticado.html' %}
 {% load static %}
+{% load formatters %}
 
 {% block header_title %} Compras {% endblock header_title %}
 
@@ -40,7 +41,7 @@
                     </td>
                     <td class="table-data">{{ compra.numero_factura|default:"-" }}</td>
                     <td class="table-data">{{ compra.items.count }}</td>
-                    <td class="table-data font-semibold text-green-600">${{ compra.total }}</td>
+                    <td class="table-data font-semibold text-green-600">{{ compra.total|money }}</td>
                     <td class="table-data">
                         <span class="status-badge
                             {% if compra.estado == 'completada' %}status-badge-success

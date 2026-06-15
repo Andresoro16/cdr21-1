@@ -207,6 +207,15 @@ def ventas_index(request):
     return render(request, 'dashboard/ventas/index.html', {'ventas': ventas})
 
 @login_required(login_url='login')
+def ventas_detalle(request, venta_id):
+    venta = get_object_or_404(
+        Orden.objects.select_related('cliente', 'factura').prefetch_related('items'),
+        id=venta_id
+    )
+
+    return render(request, 'dashboard/ventas/detalle.html', {'venta': venta})
+
+@login_required(login_url='login')
 def clientes_index(request):
     clientes_list = Cliente.objects.all()
     paginator = Paginator(clientes_list, 10)
