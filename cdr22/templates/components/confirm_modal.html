@@ -1,10 +1,10 @@
 <div id="{{ modal_id|default:'confirm-modal' }}" class="confirm-modal hidden fixed inset-0 z-50">
     <div class="confirm-modal-overlay absolute inset-0 bg-black/40"></div>
     <div class="relative mx-auto flex min-h-screen max-w-lg items-center px-4">
-        <div class="w-full rounded-lg bg-white shadow-xl">
-            <div class="border-b px-6 py-4">
-                <h2 class="confirm-modal-title text-lg font-semibold text-gray-900">Confirmar acción</h2>
-                <p class="confirm-modal-description mt-1 text-sm text-gray-600"></p>
+        <div class="dashboard-card w-full shadow-xl">
+            <div class="dashboard-card-header">
+                <h2 class="confirm-modal-title section-title">Confirmar acción</h2>
+                <p class="confirm-modal-description mt-1 section-description"></p>
             </div>
 
             <form method="POST" class="confirm-modal-form">
@@ -25,10 +25,10 @@
                 </div>
 
                 <div class="flex justify-end gap-3 border-t px-6 py-4">
-                    <button type="button" class="confirm-modal-cancel formulario_boton bg-gray-100 text-gray-700 hover:bg-gray-200">
+                    <button type="button" class="confirm-modal-cancel btn btn-md btn-secondary">
                         Cancelar
                     </button>
-                    <button type="submit" class="confirm-modal-submit formulario_boton bg-red-600 text-white hover:bg-red-700">
+                    <button type="submit" class="confirm-modal-submit btn btn-md btn-solid-danger">
                         Confirmar
                     </button>
                 </div>

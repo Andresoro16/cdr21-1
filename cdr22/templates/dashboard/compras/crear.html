@@ -4,7 +4,7 @@
 {% block header_title %} Crear Compra {% endblock header_title %}
 
 {% block contenido %}
-<div class="max-w-7xl mx-auto">
+<div class="dashboard-container">
     {% include 'components/dashboard/page_header.html' with titulo="Crear Compra" descripcion="Registre productos comprados y defina si el stock ya debe ingresar al inventario" %}
 
     {% if error %}
@@ -20,7 +20,7 @@
         </div>
     {% endif %}
 
-    <form method="POST" class="bg-white rounded-lg shadow p-8" id="compra-form">
+    <form method="POST" class="dashboard-card p-8" id="compra-form">
         {% csrf_token %}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -73,14 +73,14 @@
 
         <div class="mb-8">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold">Productos comprados</h2>
-                <button type="button" id="agregar-item" class="formulario_boton formulario_boton_azul">
+                <h2 class="section-title">Productos comprados</h2>
+                <button type="button" id="agregar-item" class="btn btn-md btn-primary">
                     + Agregar producto
                 </button>
             </div>
 
             <div class="overflow-x-auto border rounded-lg">
-                <table class="w-full" id="items-table">
+                <table class="data-table" id="items-table">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="table-header">Producto</th>
@@ -91,7 +91,7 @@
                         </tr>
                     </thead>
                     <tbody id="items-body">
-                        <tr class="compra-item-row border-b">
+                        <tr class="compra-item-row data-table-row">
                             <td class="table-data min-w-64">
                                 <select name="producto" class="formulario_input producto-select" required>
                                     <option value="">-- Seleccione --</option>
@@ -108,7 +108,7 @@
                             </td>
                             <td class="table-data font-semibold item-subtotal">$0.00</td>
                             <td class="table-data">
-                                <button type="button" class="remover-item px-3 py-2 rounded bg-red-100 text-red-700 hover:bg-red-200">
+                                <button type="button" class="remover-item btn btn-sm btn-danger">
                                     Quitar
                                 </button>
                             </td>
@@ -141,10 +141,10 @@
         </div>
 
         <div class="flex gap-4">
-            <button type="submit" class="formulario_boton formulario_boton_verde">
+            <button type="submit" class="btn btn-md btn-success">
                 Crear Compra
             </button>
-            <a href="{% url 'compras_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+            <a href="{% url 'compras_index' %}" class="btn btn-md btn-secondary">
                 Cancelar
             </a>
         </div>

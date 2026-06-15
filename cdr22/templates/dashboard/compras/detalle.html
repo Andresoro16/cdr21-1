@@ -4,20 +4,20 @@
 {% block header_title %} Detalle de Compra {% endblock header_title %}
 
 {% block contenido %}
-<div class="max-w-7xl mx-auto">
+<div class="dashboard-container">
     <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-            <a href="{% url 'compras_index' %}" class="text-sm text-blue-600 hover:underline">← Volver a compras</a>
-            <h1 class="mt-2 text-2xl font-semibold text-gray-900">Compra #{{ compra.id }}</h1>
-            <p class="text-sm text-gray-600">Historial y detalle de productos comprados</p>
+            <a href="{% url 'compras_index' %}" class="link-text">← Volver a compras</a>
+            <h1 class="mt-2 detail-title">Compra #{{ compra.id }}</h1>
+            <p class="section-description">Historial y detalle de productos comprados</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <span class="px-3 py-2 rounded text-sm font-semibold
-                {% if compra.estado == 'completada' %}bg-green-100 text-green-800
-                {% elif compra.estado == 'en_espera' %}bg-yellow-100 text-yellow-800
-                {% elif compra.estado == 'anulada' %}bg-red-100 text-red-800
-                {% else %}bg-gray-100 text-gray-800{% endif %}">
+            <span class="status-badge-lg
+                {% if compra.estado == 'completada' %}status-badge-success
+                {% elif compra.estado == 'en_espera' %}status-badge-warning
+                {% elif compra.estado == 'anulada' %}status-badge-danger
+                {% else %}status-badge-muted{% endif %}">
                 {{ compra.get_estado_display }}
             </span>
             {% include 'dashboard/compras/_acciones_estado.html' %}
@@ -25,22 +25,22 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-lg shadow p-5">
-            <p class="text-sm text-gray-500">Proveedor</p>
-            <p class="mt-1 font-semibold text-gray-900">
+        <div class="summary-card">
+            <p class="summary-label">Proveedor</p>
+            <p class="summary-value">
                 {% if compra.proveedor %}{{ compra.proveedor.nombre }}{% else %}Sin proveedor{% endif %}
             </p>
         </div>
-        <div class="bg-white rounded-lg shadow p-5">
-            <p class="text-sm text-gray-500">Factura</p>
-            <p class="mt-1 font-semibold text-gray-900">{{ compra.numero_factura|default:"-" }}</p>
+        <div class="summary-card">
+            <p class="summary-label">Factura</p>
+            <p class="summary-value">{{ compra.numero_factura|default:"-" }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-5">
-            <p class="text-sm text-gray-500">Fecha</p>
-            <p class="mt-1 font-semibold text-gray-900">{{ compra.fecha_compra }}</p>
+        <div class="summary-card">
+            <p class="summary-label">Fecha</p>
+            <p class="summary-value">{{ compra.fecha_compra }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-5">
-            <p class="text-sm text-gray-500">Stock</p>
+        <div class="summary-card">
+            <p class="summary-label">Stock</p>
             <p class="mt-1 font-semibold {% if compra.stock_aplicado %}text-green-700{% else %}text-gray-700{% endif %}">
                 {% if compra.stock_aplicado %}Aplicado{% else %}Pendiente{% endif %}
             </p>
@@ -48,12 +48,12 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <section class="lg:col-span-2 bg-white rounded-lg shadow">
-            <div class="border-b px-6 py-4">
-                <h2 class="text-lg font-semibold">Productos comprados</h2>
+        <section class="lg:col-span-2 dashboard-card">
+            <div class="dashboard-card-header">
+                <h2 class="section-title">Productos comprados</h2>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="data-table">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="table-header">Producto</th>
@@ -66,7 +66,7 @@
                     </thead>
                     <tbody>
                         {% for item in compra.items.all %}
-                            <tr class="border-b hover:bg-gray-50">
+                            <tr class="data-table-row">
                                 <td class="table-data font-medium">{{ item.producto.nombre }}</td>
                                 <td class="table-data font-mono">{{ item.producto.sku }}</td>
                                 <td class="table-data">{{ item.cantidad }}</td>
@@ -80,8 +80,8 @@
             </div>
         </section>
 
-        <aside class="bg-white rounded-lg shadow p-6 h-max">
-            <h2 class="text-lg font-semibold mb-4">Resumen</h2>
+        <aside class="dashboard-card dashboard-card-body h-max">
+            <h2 class="section-title mb-4">Resumen</h2>
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between">
                     <span class="text-gray-500">Método de pago</span>
@@ -104,14 +104,14 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-lg font-semibold mb-2">Observaciones</h2>
+        <section class="dashboard-card dashboard-card-body">
+            <h2 class="section-title mb-2">Observaciones</h2>
             <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ compra.observaciones|default:"Sin observaciones" }}</p>
         </section>
 
         {% if compra.estado == 'anulada' %}
-            <section class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-lg font-semibold mb-2 text-red-700">Anulación</h2>
+            <section class="dashboard-card dashboard-card-body">
+                <h2 class="section-title mb-2 text-red-700">Anulación</h2>
                 <p class="text-sm text-gray-500 mb-2">Fecha: {{ compra.anulada_en|default:"-" }}</p>
                 <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ compra.motivo_anulacion|default:"Sin motivo registrado" }}</p>
             </section>
