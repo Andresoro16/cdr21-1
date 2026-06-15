@@ -56,6 +56,56 @@
     @apply flex items-center gap-1 text-secondary-foreground;
   }
 
+  .auth_nav_group {
+    @apply relative p-4;
+  }
+
+  .auth_nav_group_button {
+    @apply flex items-center gap-1 text-secondary-foreground cursor-pointer;
+  }
+
+  .auth_nav_group_menu {
+    @apply mt-2 hidden min-w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5;
+  }
+
+  .auth_nav_group:hover .auth_nav_group_menu,
+  .auth_nav_group:focus-within .auth_nav_group_menu {
+    @apply block;
+  }
+
+  .auth_nav_group_link {
+    @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50;
+  }
+
+  .auth_nav_group_link_disabled {
+    @apply block px-4 py-2 text-sm text-gray-400 cursor-not-allowed;
+  }
+
+  .auth_user_menu {
+    @apply relative;
+  }
+
+  .auth_user_menu_button {
+    @apply flex items-center gap-3 text-secondary-foreground cursor-pointer;
+  }
+
+  .auth_user_menu_panel {
+    @apply hidden absolute right-0 top-full z-10 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5;
+  }
+
+  .auth_user_menu:hover .auth_user_menu_panel,
+  .auth_user_menu:focus-within .auth_user_menu_panel {
+    @apply block;
+  }
+
+  .auth_user_menu_item {
+    @apply block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50;
+  }
+
+  .auth_user_menu_item_danger {
+    @apply text-red-700 hover:bg-red-50;
+  }
+
   .auth_main_content {
     @apply p-4 min-h-screen;
     background-color: rgb(var(--color-blue) / 0.1);
@@ -76,6 +126,10 @@
 
     .auth_nav_list {
       @apply flex-row;
+    }
+
+    .auth_nav_group_menu {
+      @apply absolute left-0 top-full mt-0;
     }
 
     .auth_close_button {

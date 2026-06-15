@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 urlpatterns =[
     path ('',views.principal, name='principal'),
     path ('login', views.login_view, name='login'),
+    path ('logout', LogoutView.as_view(next_page='login'), name='logout'),
     path ('olvide-password', views.olvidePassword, name='olvide-password'),
     path ('testing', views.testing, name="testing"),
     path ('login-django', LoginView.as_view(template_name='login.html'), name='logindjango'),
