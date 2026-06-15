@@ -192,6 +192,11 @@
     // Búsqueda de clientes
     const btnBuscarCliente = document.getElementById('btn_buscar_cliente');
     const cedulaInput = document.getElementById('cliente_cedula');
+    const btnCompletar = document.getElementById('btn_completar');
+    const btnCancelar = document.getElementById('btn_cancelar');
+    const generarFacturaPdfInput = document.getElementById('generar_factura_pdf');
+    const enviarFacturaEmailInput = document.getElementById('enviar_factura_email');
+    let ventaEnProceso = false;
     
     btnBuscarCliente.addEventListener('click', async () => {
         const cedula = cedulaInput.value.trim();
@@ -367,7 +372,11 @@
     }
 
     // Completar venta
-    document.getElementById('btn_completar').addEventListener('click', async () => {
+    btnCompletar.addEventListener('click', async () => {
+        if (ventaEnProceso) {
+            return;
+        }
+
         // Validar que hay cliente
         const cedula = document.getElementById('cliente_cedula').value.trim();
         if (!cedula) {
@@ -390,8 +399,8 @@
             telefono: document.getElementById('cliente_telefono').value.trim()
         };
 
-        const generarFacturaPdf = document.getElementById('generar_factura_pdf').checked;
-        const enviarFacturaEmail = document.getElementById('enviar_factura_email').checked;
+        const generarFacturaPdf = generarFacturaPdfInput.checked;
+        const enviarFacturaEmail = enviarFacturaEmailInput.checked;
 
         if (enviarFacturaEmail && !cliente.email) {
             Notify.warning('Ingrese el correo del cliente para enviar la factura');
@@ -414,6 +423,16 @@
             generar_factura_pdf: generarFacturaPdf,
             enviar_factura_email: enviarFacturaEmail
         };
+
+        ventaEnProceso = true;
+        LoadingState.setButtonLoading(btnCompletar, true, { label: 'Generando venta...' });
+        LoadingState.setDisabled([
+            btnCancelar,
+            btnBuscarCliente,
+            productoSearchInput,
+            generarFacturaPdfInput,
+            enviarFacturaEmailInput,
+        ], true);
 
         try {
             // Enviar orden a la API
@@ -456,11 +475,25 @@
         } catch (error) {
             console.error('Error al completar venta:', error);
             Notify.error('Error al completar la venta');
+        } finally {
+            ventaEnProceso = false;
+            LoadingState.setButtonLoading(btnCompletar, false);
+            LoadingState.setDisabled([
+                btnCancelar,
+                btnBuscarCliente,
+                productoSearchInput,
+                generarFacturaPdfInput,
+                enviarFacturaEmailInput,
+            ], false);
         }
     });
 
     // Cancelar venta
-    document.getElementById('btn_cancelar').addEventListener('click', () => {
+    btnCancelar.addEventListener('click', () => {
+        if (ventaEnProceso) {
+            return;
+        }
+
         if (carrito.length > 0) {
             if (confirm('¿Descartar la venta actual?')) {
                 limpiarCliente();
