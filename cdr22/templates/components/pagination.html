@@ -1,46 +1,48 @@
 <!-- Componente de paginación reutilizable -->
-<div class="flex items-center justify-between mt-8 px-4 py-4">
+<div class="pagination">
     <!-- Información de paginación -->
-    <div class="text-sm text-gray-600">
-        Mostrando <span class="font-semibold">{{ pagina.paginator.count }}</span> elementos
-        (Página <span class="font-semibold">{{ pagina.number }}</span> de <span class="font-semibold">{{ pagina.paginator.num_pages }}</span>)
+    <div class="pagination-info">
+        <span class="font-semibold">{{ pagina.paginator.count }}</span> elementos
+        <span class="block sm:inline">
+            Página <span class="font-semibold">{{ pagina.number }}</span> de <span class="font-semibold">{{ pagina.paginator.num_pages }}</span>
+        </span>
     </div>
 
     <!-- Controles de paginación -->
-    <div class="flex space-x-2">
+    <div class="pagination-controls">
         {% if pagina.has_previous %}
-            <a href="?page=1" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Primera página">
+            <a href="?page=1" class="pagination-button" title="Primera página">
                 {% include 'components/icons/square_chevron_left.html' %}
             </a>
-            <a href="?page={{ pagina.previous_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Página anterior">
+            <a href="?page={{ pagina.previous_page_number }}" class="pagination-button" title="Página anterior">
                 {% include 'components/icons/square_chevron_left.html' %}
             </a>
         {% else %}
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Primera página">
+            <button disabled class="pagination-button pagination-button-disabled" title="Primera página">
                 {% include 'components/icons/square_chevron_left.html' %}
             </button>
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Página anterior">
+            <button disabled class="pagination-button pagination-button-disabled" title="Página anterior">
                 {% include 'components/icons/square_chevron_left.html' %}
             </button>
         {% endif %}
 
         <!-- Indicador de página actual -->
-        <div class="px-3 py-2 text-sm font-medium text-gray-700 bg-blue-50 rounded-md border border-blue-200">
+        <div class="pagination-current">
             {{ pagina.number }} / {{ pagina.paginator.num_pages }}
         </div>
 
         {% if pagina.has_next %}
-            <a href="?page={{ pagina.next_page_number }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Página siguiente">
+            <a href="?page={{ pagina.next_page_number }}" class="pagination-button" title="Página siguiente">
                 {% include 'components/icons/square_chevron_right.html' %}
             </a>
-            <a href="?page={{ pagina.paginator.num_pages }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors" title="Última página">
+            <a href="?page={{ pagina.paginator.num_pages }}" class="pagination-button" title="Última página">
                 {% include 'components/icons/square_chevron_right.html' %}
             </a>
         {% else %}
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Página siguiente">
+            <button disabled class="pagination-button pagination-button-disabled" title="Página siguiente">
                 {% include 'components/icons/square_chevron_right.html' %}
             </button>
-            <button disabled class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed opacity-50" title="Última página">
+            <button disabled class="pagination-button pagination-button-disabled" title="Última página">
                 {% include 'components/icons/square_chevron_right.html' %}
             </button>
         {% endif %}
