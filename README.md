@@ -8,6 +8,40 @@
 - ejecutar `python manage.py runserver`
 - Abrir en el navegador la URL que nos da el ultimo comando.
 
+## Ejecucion local con Docker
+
+Construir y levantar Django:
+
+```bash
+docker compose up --build web
+```
+
+Aplicar migraciones:
+
+```bash
+docker compose exec web python manage.py migrate
+```
+
+Crear superusuario:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+Levantar Tailwind en modo watcher, si se van a tocar estilos:
+
+```bash
+docker compose --profile frontend up tailwind
+```
+
+El servicio web queda disponible en:
+
+```text
+http://localhost:8000
+```
+
+Si Mailpit esta corriendo en la maquina host, el contenedor usa `host.docker.internal:1025`.
+
 ## Produccion
 - python manage.py tailwind build
 

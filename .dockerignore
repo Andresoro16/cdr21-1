@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+
+db.sqlite3
+media
+
+tests_e2e/screenshots
+importtime*.log
+trace.log

@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - .env
+    environment:
+      EMAIL_HOST: host.docker.internal
+      EMAIL_PORT: 1025
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  tailwind:
+    build:
+      context: .
+    command: python manage.py tailwind start
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    profiles:
+      - frontend
