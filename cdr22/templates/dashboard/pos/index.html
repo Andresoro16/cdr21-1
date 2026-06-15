@@ -151,14 +151,36 @@
             </div>
         </div>
 
-        <!-- Botones de acción -->
-        <div class="mt-6 flex gap-3 justify-end">
-            <button id="btn_cancelar" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
-                Cancelar Venta
-            </button>
-            <button id="btn_completar" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium">
-                Completar Venta
-            </button>
+        <!-- Opciones y botones de acción -->
+        <div class="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label class="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <input
+                        type="checkbox"
+                        id="generar_factura_pdf"
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked
+                    >
+                    Generar PDF
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                    <input
+                        type="checkbox"
+                        id="enviar_factura_email"
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    >
+                    Enviar por correo
+                </label>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button id="btn_cancelar" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors font-medium">
+                    Cancelar Venta
+                </button>
+                <button id="btn_completar" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium">
+                    Completar Venta
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -286,6 +308,9 @@
                     </td>
                 </tr>
             `;
+            document.getElementById('total_subtotal').textContent = Formatters.money(0);
+            document.getElementById('total_impuesto').textContent = Formatters.money(0);
+            document.getElementById('total_final').textContent = Formatters.money(0);
             return;
         }
 
@@ -359,11 +384,19 @@
         // Obtener datos del cliente
         const cliente = {
             cedula: cedula,
-            nombre: document.getElementById('cliente_nombre').value,
-            apellidos: document.getElementById('cliente_apellidos').value,
-            email: document.getElementById('cliente_email').value,
-            telefono: document.getElementById('cliente_telefono').value
+            nombre: document.getElementById('cliente_nombre').value.trim(),
+            apellidos: document.getElementById('cliente_apellidos').value.trim(),
+            email: document.getElementById('cliente_email').value.trim(),
+            telefono: document.getElementById('cliente_telefono').value.trim()
         };
+
+        const generarFacturaPdf = document.getElementById('generar_factura_pdf').checked;
+        const enviarFacturaEmail = document.getElementById('enviar_factura_email').checked;
+
+        if (enviarFacturaEmail && !cliente.email) {
+            Notify.warning('Ingrese el correo del cliente para enviar la factura');
+            return;
+        }
 
         // Calcular totales
         const subtotal = carrito.reduce((acc, item) => acc + (item.precio_unitario * item.cantidad), 0);
@@ -377,7 +410,9 @@
             metodo_pago: 'efectivo',
             subtotal: subtotal,
             impuesto: impuesto,
-            total: total
+            total: total,
+            generar_factura_pdf: generarFacturaPdf,
+            enviar_factura_email: enviarFacturaEmail
         };
 
         try {
@@ -393,8 +428,21 @@
             const data = await response.json();
 
             if (response.ok) {
+                const orden = data.data.orden;
                 // Éxito
-                Notify.success(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: ${Formatters.money(data.orden.total)}`);
+                Notify.success(`✅ Venta completada!\nFactura: ${orden.factura_numero}\nTotal: ${Formatters.money(orden.total)}`);
+
+                if (orden.factura_pdf_url) {
+                    window.open(orden.factura_pdf_url, '_blank', 'noopener');
+                }
+
+                if (enviarFacturaEmail) {
+                    if (orden.email_enviado) {
+                        Notify.success('Factura enviada por correo');
+                    } else {
+                        Notify.warning('La venta se completó, pero no se pudo enviar el correo');
+                    }
+                }
                 
                 // Limpiar formulario
                 limpiarCliente();
@@ -403,7 +451,7 @@
                 carrito = [];
                 actualizarCarrito();
             } else {
-                Notify.error(`❌ Error: ${data.mensaje}`);
+                Notify.error(`❌ Error: ${data.mensaje || 'No se pudo completar la venta'}`);
             }
         } catch (error) {
             console.error('Error al completar venta:', error);

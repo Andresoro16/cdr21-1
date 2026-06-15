@@ -62,6 +62,113 @@ class OrdenReadSerializer(serializers.ModelSerializer):
         fields = ['id', 'metodo_pago', 'precio_total', 'cliente_cedula', 'estado', 'created_at']
 
 
+class OrdenPOSClienteSerializer(serializers.Serializer):
+    cedula = serializers.CharField(
+        error_messages={
+            'blank': 'Ingrese la cédula del cliente.',
+            'required': 'Ingrese la cédula del cliente.',
+        }
+    )
+    nombre = serializers.CharField(required=False, allow_blank=True)
+    apellidos = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    telefono = serializers.CharField(required=False, allow_blank=True)
+
+
+class OrdenPOSItemSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source='producto',
+        queryset=Producto.objects.filter(estado='activo'),
+        required=False,
+        error_messages={
+            'does_not_exist': 'El producto seleccionado no existe o no está activo.',
+            'incorrect_type': 'El producto seleccionado no es válido.',
+        }
+    )
+    producto_id = serializers.PrimaryKeyRelatedField(
+        source='producto',
+        queryset=Producto.objects.filter(estado='activo'),
+        required=False,
+        error_messages={
+            'does_not_exist': 'El producto seleccionado no existe o no está activo.',
+            'incorrect_type': 'El producto seleccionado no es válido.',
+        }
+    )
+    cantidad = serializers.IntegerField(
+        min_value=1,
+        error_messages={
+            'min_value': 'La cantidad debe ser mayor a cero.',
+            'required': 'Ingrese la cantidad.',
+            'invalid': 'La cantidad debe ser un número entero.',
+        }
+    )
+    precio_unitario = serializers.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        min_value=Decimal('0.01'),
+        error_messages={
+            'min_value': 'El precio debe ser mayor a cero.',
+            'required': 'Ingrese el precio unitario.',
+            'invalid': 'El precio debe ser un número válido.',
+        }
+    )
+
+    def validate(self, attrs):
+        if 'producto' not in attrs:
+            raise serializers.ValidationError({
+                'producto_id': ['Seleccione un producto.']
+            })
+        return attrs
+
+
+class OrdenPOSCreateSerializer(serializers.Serializer):
+    cliente = OrdenPOSClienteSerializer()
+    items = OrdenPOSItemSerializer(many=True)
+    metodo_pago = serializers.ChoiceField(
+        choices=['efectivo', 'tarjeta', 'transferencia'],
+        default='efectivo',
+        error_messages={
+            'invalid_choice': 'Seleccione un método de pago válido.',
+        }
+    )
+    subtotal = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=0)
+    impuesto = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=0)
+    total = serializers.DecimalField(max_digits=15, decimal_places=2, min_value=0)
+    generar_factura_pdf = serializers.BooleanField(required=False, default=False)
+    enviar_factura_email = serializers.BooleanField(required=False, default=False)
+
+    def validate_items(self, value):
+        if not value:
+            raise serializers.ValidationError('La orden debe tener al menos un producto.')
+        return value
+
+    def validate(self, attrs):
+        cliente = attrs.get('cliente', {})
+
+        if attrs.get('enviar_factura_email') and not cliente.get('email'):
+            raise serializers.ValidationError({
+                'cliente.email': ['Ingrese el correo del cliente para enviar la factura.']
+            })
+
+        subtotal_calculado = sum(
+            item['precio_unitario'] * item['cantidad']
+            for item in attrs.get('items', [])
+        )
+        total_calculado = subtotal_calculado + attrs.get('impuesto', Decimal('0'))
+
+        if attrs.get('subtotal') != subtotal_calculado:
+            raise serializers.ValidationError({
+                'subtotal': ['El subtotal no coincide con los productos enviados.']
+            })
+
+        if attrs.get('total') != total_calculado:
+            raise serializers.ValidationError({
+                'total': ['El total no coincide con los productos enviados.']
+            })
+
+        return attrs
+
+
 class CompraItemCreateSerializer(serializers.Serializer):
     producto_id = serializers.PrimaryKeyRelatedField(
         source='producto',

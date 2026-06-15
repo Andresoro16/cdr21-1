@@ -1,0 +1,192 @@
+{% load formatters %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Factura {{ factura.numero }}</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 18mm;
+        }
+
+        body {
+            color: #111827;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .header {
+            align-items: flex-start;
+            border-bottom: 2px solid #111827;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 6px;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+        .invoice-box {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 12px 16px;
+            text-align: right;
+        }
+
+        .invoice-number {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1fr 1fr;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            text-transform: uppercase;
+        }
+
+        .panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .field {
+            margin: 0 0 4px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        th {
+            background: #f3f4f6;
+            border-bottom: 1px solid #d1d5db;
+            font-size: 11px;
+            padding: 8px;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .number {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .totals {
+            margin-left: auto;
+            width: 260px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .grand-total {
+            border-top: 2px solid #111827;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 6px;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div>
+            <h1 class="company-name">{{ configuracion.nombre_empresa }}</h1>
+            <p class="field muted">Factura de venta</p>
+        </div>
+
+        <div class="invoice-box">
+            <p class="invoice-number">{{ factura.numero }}</p>
+            <p class="field muted">{{ factura.fecha_emision|date:"Y-m-d H:i" }}</p>
+        </div>
+    </header>
+
+    <section class="grid">
+        <div class="panel">
+            <h2 class="section-title">Cliente</h2>
+            {% if cliente %}
+                <p class="field"><strong>{{ cliente.nombre }} {{ cliente.apellidos }}</strong></p>
+                <p class="field">Cédula: {{ cliente.cedula }}</p>
+                <p class="field">Email: {{ cliente.email|default:"-" }}</p>
+                <p class="field">Teléfono: {{ cliente.telefono|default:"-" }}</p>
+            {% else %}
+                <p class="field muted">Sin cliente asociado</p>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <h2 class="section-title">Venta</h2>
+            <p class="field">Orden: #{{ orden.id }}</p>
+            <p class="field">Método de pago: {{ orden.metodo_pago|default:"-" }}</p>
+            <p class="field">Estado: {{ orden.get_estado_display }}</p>
+        </div>
+    </section>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="number">Cantidad</th>
+                <th class="number">Precio unitario</th>
+                <th class="number">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.detalle }}</td>
+                    <td class="number">{{ item.cantidad }}</td>
+                    <td class="number">{{ item.precio|money }}</td>
+                    <td class="number">{{ item.subtotal|money }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <section class="totals">
+        <div class="total-row">
+            <span>Subtotal</span>
+            <strong>{{ orden.subtotal|money }}</strong>
+        </div>
+        <div class="total-row">
+            <span>Impuesto</span>
+            <strong>{{ orden.impuesto|money }}</strong>
+        </div>
+        <div class="total-row grand-total">
+            <span>Total</span>
+            <span>{{ orden.precio_total|money }}</span>
+        </div>
+    </section>
+</body>
+</html>

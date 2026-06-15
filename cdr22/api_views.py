@@ -3,12 +3,20 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from django.db import models, transaction
+from django.db import models
 from .api_responses import error_response, success_response, validation_error_response
 from .models import Compra, Orden, Producto, Cliente
-from .serializers import CompraCreateSerializer, CompraEstadoSerializer, CompraReadSerializer, OrdenSerializer, OrdenReadSerializer
-from .services.configuracion import generar_numero_factura
+from .serializers import (
+    CompraCreateSerializer,
+    CompraEstadoSerializer,
+    CompraReadSerializer,
+    OrdenPOSCreateSerializer,
+    OrdenSerializer,
+    OrdenReadSerializer,
+)
 from .services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
+from .services.facturas import enviar_factura_por_email, render_factura_pdf
+from .services.ventas import OrdenStockError, crear_orden_pos
 import json
 
 # class Authentication: 
@@ -211,159 +219,71 @@ class OrdenCreateAPIView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-        except:
-            return JsonResponse({
-                "mensaje": "Mensaje inválido, debe ser JSON"
-            }, status=400)
-        
+        except json.JSONDecodeError:
+            return error_response("Mensaje inválido, debe ser JSON", status=400)
+
+        serializer = OrdenPOSCreateSerializer(data=data)
+        if not serializer.is_valid():
+            return validation_error_response(serializer.errors)
+
         try:
-            # Obtener datos del cliente
-            cliente_data = data.get('cliente', {})
-            cedula = cliente_data.get('cedula', '').strip()
-            
-            if not cedula:
-                return JsonResponse({
-                    "mensaje": "La cédula del cliente es requerida"
-                }, status=400)
-            
-            # Buscar o crear cliente
-            cliente, created = Cliente.objects.get_or_create(
-                cedula=cedula,
-                defaults={
-                    'nombre': cliente_data.get('nombre', ''),
-                    'apellidos': cliente_data.get('apellidos', ''),
-                    'email': cliente_data.get('email', ''),
-                    'telefono': cliente_data.get('telefono', '')
-                }
-            )
-            
-            if not created:
-                # Actualizar datos si el cliente ya existe
-                cliente.nombre = cliente_data.get('nombre', cliente.nombre)
-                cliente.apellidos = cliente_data.get('apellidos', cliente.apellidos)
-                cliente.email = cliente_data.get('email', cliente.email)
-                cliente.telefono = cliente_data.get('telefono', cliente.telefono)
-                cliente.save()
-            
-            # Obtener datos de la orden
-            items = data.get('items', [])
-            metodo_pago = data.get('metodo_pago', 'no especificado')
-            subtotal = float(data.get('subtotal', 0))
-            impuesto = float(data.get('impuesto', 0))
-            total = float(data.get('total', 0))
-            
-            if not items:
-                return JsonResponse({
-                    "mensaje": "La orden debe contener al menos un artículo"
-                }, status=400)
-            
-            productos_validados = []
+            orden = crear_orden_pos(serializer.validated_data)
+        except OrdenStockError as e:
+            return validation_error_response(e.errores)
 
-            for item in items:
-                # Buscar por 'id' (como lo envía el carrito del POS)
-                producto_id = item.get('id') or item.get('producto_id')
-                
-                if not producto_id:
-                    return JsonResponse({
-                        "mensaje": "Cada item debe tener un id o producto_id"
-                    }, status=400)
-                
-                try:
-                    producto = Producto.objects.get(id=producto_id)
-                except Producto.DoesNotExist:
-                    return JsonResponse({
-                        "mensaje": f"Producto con id {producto_id} no existe"
-                    }, status=404)
+        base_url = request.build_absolute_uri('/')
+        factura_pdf_url = request.build_absolute_uri(
+            f'/api/ordenes/{orden.id}/factura/pdf/'
+        )
+        email_enviado = False
+        email_error = None
 
-                cantidad = int(item.get('cantidad', 1))
+        if serializer.validated_data.get('enviar_factura_email'):
+            try:
+                enviar_factura_por_email(orden, base_url=base_url)
+                email_enviado = True
+            except Exception as e:
+                email_error = str(e)
 
-                if producto.stock < cantidad:
-                    return JsonResponse({
-                        "mensaje": "Stock insuficiente",
-                        "errores": {
-                            "producto_id": producto.id,
-                            "producto": producto.nombre,
-                            "stock_disponible": producto.stock,
-                            "cantidad_solicitada": cantidad,
-                            "detalle": f"No hay suficiente stock para {producto.nombre}. Disponible: {producto.stock}, solicitado: {cantidad}."
-                        }
-                    }, status=422)
+        data = {
+            "orden": {
+                'id': orden.id,
+                'factura_numero': orden.factura.numero,
+                'factura_pdf_url': factura_pdf_url if serializer.validated_data.get('generar_factura_pdf') else None,
+                'email_enviado': email_enviado,
+                'email_error': email_error,
+                'cliente': {
+                    'cedula': orden.cliente.cedula,
+                    'nombre': orden.cliente.nombre,
+                    'apellidos': orden.cliente.apellidos,
+                    'email': orden.cliente.email,
+                },
+                'subtotal': str(orden.subtotal),
+                'impuesto': str(orden.impuesto),
+                'total': str(orden.precio_total),
+                'estado': orden.estado,
+                'fecha': orden.created_at.isoformat()
+            }
+        }
 
-                productos_validados.append({
-                    "producto": producto,
-                    "cantidad": cantidad,
-                    "precio_unitario": float(item.get('precio_unitario', 0)),
-                })
+        return success_response("Orden creada exitosamente", data=data, status=201)
 
-            from .models import Factura, OrdenItem
 
-            with transaction.atomic():
-                # Crear factura
-                factura_numero = generar_numero_factura()
+@method_decorator(csrf_exempt, name='dispatch')
+class FacturaPDFAPIView(View):
+    def get(self, request, orden_id):
+        try:
+            orden = Orden.objects.select_related('cliente', 'factura').prefetch_related('items').get(id=orden_id)
+        except Orden.DoesNotExist:
+            orden = None
 
-                factura = Factura.objects.create(
-                    numero=factura_numero,
-                    cliente=cliente,
-                    subtotal=subtotal,
-                    impuesto=impuesto,
-                    total=total,
-                    metodo_pago=metodo_pago,
-                    estado='emitida'
-                )
+        if not orden or not orden.factura:
+            return error_response("Factura no encontrada", status=404)
 
-                # Crear orden
-                orden = Orden.objects.create(
-                    cliente=cliente,
-                    factura=factura,
-                    metodo_pago=metodo_pago,
-                    subtotal=subtotal,
-                    impuesto=impuesto,
-                    precio_total=total,
-                    estado='completada'
-                )
-
-                # Crear items de la orden
-                for item_validado in productos_validados:
-                    producto = item_validado["producto"]
-                    cantidad = item_validado["cantidad"]
-                
-                    OrdenItem.objects.create(
-                        orden=orden,
-                        detalle=producto.nombre,
-                        precio=item_validado["precio_unitario"],
-                        cantidad=cantidad
-                    )
-
-                    # Actualizar stock del producto
-                    producto.stock -= cantidad
-                    producto.save()
-            
-            return JsonResponse({
-                "mensaje": "Orden creada exitosamente",
-                "orden": {
-                    'id': orden.id,
-                    'factura_numero': factura.numero,
-                    'cliente': {
-                        'cedula': cliente.cedula,
-                        'nombre': cliente.nombre,
-                        'apellidos': cliente.apellidos,
-                    },
-                    'subtotal': str(orden.subtotal),
-                    'impuesto': str(orden.impuesto),
-                    'total': str(orden.precio_total),
-                    'estado': orden.estado,
-                    'fecha': orden.created_at.isoformat()
-                }
-            }, status=201)
-        
-        except Producto.DoesNotExist:
-            return JsonResponse({
-                "mensaje": "Uno o más productos no existen"
-            }, status=404)
-        except Exception as e:
-            return JsonResponse({
-                "mensaje": f"Error al crear la orden: {str(e)}"
-            }, status=500)
+        pdf = render_factura_pdf(orden, base_url=request.build_absolute_uri('/'))
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="factura-{orden.factura.numero}.pdf"'
+        return response
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ComprasAPIView(View):

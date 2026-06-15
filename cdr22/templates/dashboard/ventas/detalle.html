@@ -13,12 +13,19 @@
             <p class="section-description">Detalle de la venta y productos facturados</p>
         </div>
 
-        <span class="status-badge-lg
-            {% if venta.estado == 'completada' %}status-badge-success
-            {% elif venta.estado == 'pendiente' %}status-badge-warning
-            {% else %}status-badge-danger{% endif %}">
-            {{ venta.get_estado_display }}
-        </span>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {% if venta.factura %}
+                <a href="{% url 'api.ordenes.factura.pdf' venta.id %}" target="_blank" class="btn btn-secondary btn-sm">
+                    Ver PDF
+                </a>
+            {% endif %}
+            <span class="status-badge-lg
+                {% if venta.estado == 'completada' %}status-badge-success
+                {% elif venta.estado == 'pendiente' %}status-badge-warning
+                {% else %}status-badge-danger{% endif %}">
+                {{ venta.get_estado_display }}
+            </span>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
