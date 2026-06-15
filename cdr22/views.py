@@ -7,6 +7,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db import IntegrityError
+from django.db.models import Count
 import secrets
 from cdr22.forms import ConfiguracionSistemaForm, UsuarioCreateForm
 from cdr22.models import Producto, Categoria, Cliente, Compra, Orden, Proveedor
@@ -108,6 +110,75 @@ def testing(request):
     return render(request, 'testing.html')
 
 """ Productos Views """
+@login_required(login_url='login')
+def categorias_index(request):
+    categorias_list = Categoria.objects.annotate(productos_count=Count('productos')).all()
+    paginator = Paginator(categorias_list, 10)
+    page_number = request.GET.get('page')
+    categorias = paginator.get_page(page_number)
+
+    return render(request, 'dashboard/categorias/index.html', {'categorias': categorias})
+
+@login_required(login_url='login')
+def categorias_crear(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        try:
+            Categoria.objects.create(
+                nombre=nombre,
+                descripcion=descripcion or None,
+            )
+            messages.success(request, 'Categoría creada correctamente.')
+            return redirect('categorias_index')
+        except IntegrityError:
+            return render(request, 'dashboard/categorias/crear.html', {
+                'error': 'Ya existe una categoría con ese nombre.',
+                'categoria': {
+                    'nombre': nombre,
+                    'descripcion': descripcion,
+                },
+            })
+
+    return render(request, 'dashboard/categorias/crear.html')
+
+@login_required(login_url='login')
+def categorias_editar(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+
+    if request.method == 'POST':
+        categoria.nombre = request.POST.get('nombre', '').strip()
+        categoria.descripcion = request.POST.get('descripcion', '').strip() or None
+
+        try:
+            categoria.save()
+            messages.success(request, 'Categoría actualizada correctamente.')
+            return redirect('categorias_index')
+        except IntegrityError:
+            return render(request, 'dashboard/categorias/editar.html', {
+                'categoria': categoria,
+                'error': 'Ya existe una categoría con ese nombre.',
+            })
+
+    return render(request, 'dashboard/categorias/editar.html', {'categoria': categoria})
+
+@login_required(login_url='login')
+def categorias_eliminar(request, categoria_id):
+    categoria = get_object_or_404(
+        Categoria.objects.annotate(productos_count=Count('productos')),
+        id=categoria_id
+    )
+
+    if request.method == 'POST':
+        categoria.delete()
+        messages.success(request, 'Categoría eliminada correctamente.')
+        return redirect('categorias_index')
+
+    return render(request, 'dashboard/categorias/eliminar.html', {
+        'categoria': categoria
+    })
+
 @login_required(login_url='login')
 def productos_index(request):
     productos_list = Producto.objects.all()

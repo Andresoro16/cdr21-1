@@ -51,9 +51,9 @@ INSTALLED_APPS = [
     'rest_framework'
 ]
 
-if DEBUG:
-    # Add django_browser_reload only in DEBUG mode
-    # INSTALLED_APPS += ["django_browser_reload"]
+# if DEBUG:
+#     # Add django_browser_reload only in DEBUG mode
+#     INSTALLED_APPS += ["django_browser_reload"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,11 +65,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if DEBUG:
-    # Add django_browser_reload middleware only in DEBUG mode
-    MIDDLEWARE += [
-        "django_browser_reload.middleware.BrowserReloadMiddleware",
-    ]
+# if DEBUG:
+#     # Add django_browser_reload middleware only in DEBUG mode
+#     MIDDLEWARE += [
+#         "django_browser_reload.middleware.BrowserReloadMiddleware",
+#     ]
 
 ROOT_URLCONF = 'config.urls'
 

@@ -21,6 +21,10 @@ urlpatterns =[
     path ('login-django', LoginView.as_view(template_name='login.html'), name='logindjango'),
     
     path('dashboard/home', views.home, name='home'),
+    path('dashboard/categorias/', views.categorias_index, name='categorias_index'),
+    path('dashboard/categorias/crear/', views.categorias_crear, name='categorias_crear'),
+    path('dashboard/categorias/editar/<int:categoria_id>/', views.categorias_editar, name='categorias_editar'),
+    path('dashboard/categorias/eliminar/<int:categoria_id>/', views.categorias_eliminar, name='categorias_eliminar'),
     path('dashboard/productos/', views.productos_index, name='productos_index'),
     path('dashboard/productos/crear/', views.productos_crear, name='productos_crear'),
     path('dashboard/productos/editar/<int:producto_id>/', views.productos_editar, name='productos_editar'),

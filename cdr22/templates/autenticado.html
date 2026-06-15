@@ -49,6 +49,18 @@
                     <li class="auth_nav_group">
                         <button type="button" class="auth_nav_group_button">
                             <!-- Icono -->
+                            {% include "components/icons/product.html" %}
+                            Inventario
+                            {% include "components/icons/chevron_down.html" %}
+                        </button>
+                        <div class="auth_nav_group_menu">
+                            <a class="auth_nav_group_link" href="{% url 'productos_index' %}">Productos</a>
+                            <a class="auth_nav_group_link" href="{% url 'categorias_index' %}">Categorías</a>
+                        </div>
+                    </li>
+                    <li class="auth_nav_group">
+                        <button type="button" class="auth_nav_group_button">
+                            <!-- Icono -->
                             {% include "components/icons/invoice.html" %}
                             Compras
                             {% include "components/icons/chevron_down.html" %}
@@ -67,7 +79,6 @@
                         </button>
                         <div class="auth_nav_group_menu">
                             <a class="auth_nav_group_link" href="{% url 'pos' %}">Punto de venta</a>
-                            <a class="auth_nav_group_link" href="{% url 'productos_index' %}">Productos</a>
                             <a class="auth_nav_group_link" href="{% url 'clientes_index' %}">Clientes</a>
                             <a class="auth_nav_group_link" href="{% url 'ventas_index' %}">Lista de ventas</a>
                         </div>

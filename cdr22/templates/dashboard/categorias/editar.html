@@ -1,0 +1,54 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Editar Categoría {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-3xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Editar Categoría" descripcion="Modifique la información de la categoría seleccionada" %}
+
+    <form method="POST" class="bg-white rounded-lg shadow p-8">
+        {% csrf_token %}
+
+        <div class="mb-6 flex flex-col">
+            <label class="formulario_label mb-2" for="nombre">Nombre *</label>
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                value="{{ categoria.nombre }}"
+                placeholder="Ej: Frenos, Lubricantes, Llantas"
+                class="formulario_input"
+                maxlength="100"
+                required
+            >
+        </div>
+
+        <div class="mb-6 flex flex-col">
+            <label class="formulario_label mb-2" for="descripcion">Descripción</label>
+            <textarea
+                id="descripcion"
+                name="descripcion"
+                placeholder="Detalle opcional de la categoría..."
+                class="formulario_input"
+                rows="4"
+            >{{ categoria.descripcion|default:'' }}</textarea>
+        </div>
+
+        {% if error %}
+            <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="flex gap-4">
+            <button type="submit" class="formulario_boton formulario_boton_verde">
+                Actualizar Categoría
+            </button>
+            <a href="{% url 'categorias_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock contenido %}

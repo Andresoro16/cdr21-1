@@ -1,0 +1,62 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Eliminar Categoría {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-2xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Eliminar Categoría" descripcion="Los productos asociados quedarán sin categoría" %}
+
+    <div class="bg-white rounded-lg shadow p-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <div class="text-red-600 text-2xl">⚠️</div>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-red-800">Confirmar Eliminación</h3>
+                    <p class="mt-2 text-sm text-red-700">
+                        ¿Está seguro de que desea eliminar esta categoría? Los productos relacionados no se eliminarán.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Información de la Categoría</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Nombre:</span>
+                    <p class="text-sm">{{ categoria.nombre }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Productos asociados:</span>
+                    <p class="text-sm">{{ categoria.productos_count }}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <span class="text-sm font-medium text-gray-600">Descripción:</span>
+                    <p class="text-sm">
+                        {% if categoria.descripcion %}
+                            {{ categoria.descripcion }}
+                        {% else %}
+                            Sin descripción
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <button type="submit" class="formulario_boton" style="background-color: #dc2626; color: white;">
+                    🗑️ Eliminar Definitivamente
+                </button>
+                <a href="{% url 'categorias_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

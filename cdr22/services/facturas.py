@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from weasyprint import HTML
 
 from cdr22.services.configuracion import get_configuracion_sistema
 
 
 def render_factura_pdf(orden, base_url=None):
+    from weasyprint import HTML
+
     html = render_to_string(
         'dashboard/facturas/pdf.html',
         {
