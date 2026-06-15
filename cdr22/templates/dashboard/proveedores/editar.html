@@ -1,0 +1,90 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Editar Proveedor {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-3xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Editar Proveedor" descripcion="Actualice los datos de contacto del proveedor" %}
+
+    <form method="POST" class="bg-white rounded-lg shadow p-8">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="flex flex-col md:col-span-2">
+                <label class="formulario_label mb-2" for="nombre">Nombre *</label>
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    value="{{ proveedor.nombre }}"
+                    placeholder="Nombre o razón social"
+                    class="formulario_input"
+                    maxlength="150"
+                    required
+                >
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="documento">Documento</label>
+                <input
+                    type="text"
+                    id="documento"
+                    name="documento"
+                    value="{{ proveedor.documento|default:'' }}"
+                    placeholder="NIT, cédula o identificación"
+                    class="formulario_input"
+                    maxlength="50"
+                >
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="telefono">Teléfono</label>
+                <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    value="{{ proveedor.telefono|default:'' }}"
+                    placeholder="Ej: +57 300 1234567"
+                    class="formulario_input"
+                    maxlength="20"
+                >
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="email">Correo</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ proveedor.email|default:'' }}"
+                    placeholder="proveedor@ejemplo.com"
+                    class="formulario_input"
+                >
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="direccion">Dirección</label>
+                <input
+                    type="text"
+                    id="direccion"
+                    name="direccion"
+                    value="{{ proveedor.direccion|default:'' }}"
+                    placeholder="Dirección comercial"
+                    class="formulario_input"
+                    maxlength="255"
+                >
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="formulario_boton formulario_boton_verde">
+                Actualizar Proveedor
+            </button>
+            <a href="{% url 'proveedores_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock contenido %}

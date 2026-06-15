@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db import IntegrityError
-from django.db.models import Count
+from django.db.models import Avg, Count, F, Sum
+from django.utils import timezone
 import secrets
 from cdr22.forms import ConfiguracionSistemaForm, UsuarioCreateForm
 from cdr22.models import Producto, Categoria, Cliente, Compra, Orden, Proveedor
@@ -104,7 +105,36 @@ def olvidePassword(request):
 """ Dashboard Views """
 @login_required(login_url='login') 
 def home(request):
-    return render(request, 'dashboard/home.html')
+    hoy = timezone.localdate()
+
+    ventas_hoy = Orden.objects.exclude(estado='cancelada').filter(created_at__date=hoy)
+    ventas_resumen = ventas_hoy.aggregate(
+        total=Sum('precio_total'),
+        promedio=Avg('precio_total'),
+    )
+
+    stock_bajo_queryset = Producto.objects.filter(
+        estado='activo',
+        stock__lte=F('stock_minimo'),
+    )
+
+    context = {
+        'hoy': hoy,
+        'ventas_hoy_total': ventas_resumen['total'] or 0,
+        'ventas_hoy_count': ventas_hoy.count(),
+        'ticket_promedio': ventas_resumen['promedio'] or 0,
+        'compras_en_espera_count': Compra.objects.filter(estado='en_espera').count(),
+        'compras_stock_pendiente_count': Compra.objects.exclude(estado='anulada').filter(stock_aplicado=False).count(),
+        'productos_activos_count': Producto.objects.filter(estado='activo').count(),
+        'productos_sin_stock_count': Producto.objects.filter(estado='activo', stock=0).count(),
+        'productos_stock_bajo_count': stock_bajo_queryset.count(),
+        'productos_sin_categoria_count': Producto.objects.filter(estado='activo', categoria__isnull=True).count(),
+        'stock_critico': stock_bajo_queryset.select_related('categoria').order_by('stock', 'nombre')[:5],
+        'ultimas_ventas': Orden.objects.select_related('cliente', 'factura').order_by('-created_at')[:5],
+        'ultimas_compras': Compra.objects.select_related('proveedor').order_by('-fecha_compra', '-created_at')[:5],
+    }
+
+    return render(request, 'dashboard/home.html', context)
 
 def testing(request):
     return render(request, 'testing.html')
@@ -199,6 +229,7 @@ def productos_crear(request):
         precio_costo = request.POST.get('precio_costo')
         precio_venta = request.POST.get('precio_venta')
         garantia_meses = request.POST.get('garantia_meses')
+        stock_minimo = request.POST.get('stock_minimo') or 5
         estado = request.POST.get('estado')
         
         try:
@@ -213,6 +244,7 @@ def productos_crear(request):
                 precio_costo=precio_costo,
                 precio_venta=precio_venta,
                 garantia_meses=garantia_meses,
+                stock_minimo=stock_minimo,
                 estado=estado
             )
             
@@ -239,6 +271,7 @@ def productos_editar(request, producto_id):
         precio_costo = request.POST.get('precio_costo')
         precio_venta = request.POST.get('precio_venta')
         garantia_meses = request.POST.get('garantia_meses')
+        stock_minimo = request.POST.get('stock_minimo') or 5
         estado = request.POST.get('estado')
         
         try:
@@ -253,6 +286,7 @@ def productos_editar(request, producto_id):
             producto.precio_costo = precio_costo
             producto.precio_venta = precio_venta
             producto.garantia_meses = garantia_meses
+            producto.stock_minimo = stock_minimo
             producto.estado = estado
             producto.save()
             
@@ -385,6 +419,63 @@ def clientes_eliminar(request, cliente_id):
     
     return render(request, 'dashboard/clientes/eliminar.html', {
         'cliente': cliente
+    })
+
+@login_required(login_url='login')
+def proveedores_index(request):
+    proveedores_list = Proveedor.objects.annotate(compras_count=Count('compras')).all()
+    paginator = Paginator(proveedores_list, 10)
+    page_number = request.GET.get('page')
+    proveedores = paginator.get_page(page_number)
+
+    return render(request, 'dashboard/proveedores/index.html', {'proveedores': proveedores})
+
+@login_required(login_url='login')
+def proveedores_crear(request):
+    if request.method == 'POST':
+        Proveedor.objects.create(
+            nombre=request.POST.get('nombre', '').strip(),
+            documento=request.POST.get('documento', '').strip() or None,
+            telefono=request.POST.get('telefono', '').strip() or None,
+            email=request.POST.get('email', '').strip() or None,
+            direccion=request.POST.get('direccion', '').strip() or None,
+        )
+        messages.success(request, 'Proveedor creado correctamente.')
+        return redirect('proveedores_index')
+
+    return render(request, 'dashboard/proveedores/crear.html')
+
+@login_required(login_url='login')
+def proveedores_editar(request, proveedor_id):
+    proveedor = get_object_or_404(Proveedor, id=proveedor_id)
+
+    if request.method == 'POST':
+        proveedor.nombre = request.POST.get('nombre', '').strip()
+        proveedor.documento = request.POST.get('documento', '').strip() or None
+        proveedor.telefono = request.POST.get('telefono', '').strip() or None
+        proveedor.email = request.POST.get('email', '').strip() or None
+        proveedor.direccion = request.POST.get('direccion', '').strip() or None
+        proveedor.save()
+
+        messages.success(request, 'Proveedor actualizado correctamente.')
+        return redirect('proveedores_index')
+
+    return render(request, 'dashboard/proveedores/editar.html', {'proveedor': proveedor})
+
+@login_required(login_url='login')
+def proveedores_eliminar(request, proveedor_id):
+    proveedor = get_object_or_404(
+        Proveedor.objects.annotate(compras_count=Count('compras')),
+        id=proveedor_id
+    )
+
+    if request.method == 'POST':
+        proveedor.delete()
+        messages.success(request, 'Proveedor eliminado correctamente.')
+        return redirect('proveedores_index')
+
+    return render(request, 'dashboard/proveedores/eliminar.html', {
+        'proveedor': proveedor
     })
 
 @login_required(login_url='login')

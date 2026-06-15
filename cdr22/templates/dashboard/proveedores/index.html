@@ -1,0 +1,91 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Proveedores {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Gestión de Proveedores" descripcion="Administre los proveedores usados en el registro de compras" %}
+
+    <div class="flex justify-end mb-6">
+        <a href="{% url 'proveedores_crear' %}" class="btn btn-md btn-success">
+            + Crear Proveedor
+        </a>
+    </div>
+
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead class="data-table-head">
+                <tr>
+                    <th class="table-header">Nombre</th>
+                    <th class="table-header">Documento</th>
+                    <th class="table-header">Contacto</th>
+                    <th class="table-header">Dirección</th>
+                    <th class="table-header">Compras</th>
+                    <th class="table-header text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proveedor in proveedores.object_list %}
+                <tr class="data-table-row">
+                    <td class="table-data font-medium">{{ proveedor.nombre }}</td>
+                    <td class="table-data font-mono">
+                        {% if proveedor.documento %}
+                            {{ proveedor.documento }}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="table-data">
+                        {% if proveedor.email %}
+                            <a href="mailto:{{ proveedor.email }}" class="text-blue-600 hover:underline">{{ proveedor.email }}</a>
+                        {% else %}
+                            <span class="text-gray-400">Sin correo</span>
+                        {% endif %}
+                        <br>
+                        {% if proveedor.telefono %}
+                            <span>{{ proveedor.telefono }}</span>
+                        {% else %}
+                            <span class="text-gray-400">Sin teléfono</span>
+                        {% endif %}
+                    </td>
+                    <td class="table-data">
+                        {% if proveedor.direccion %}
+                            {{ proveedor.direccion }}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="table-data">{{ proveedor.compras_count }}</td>
+                    <td class="table-data text-center">
+                        <div class="flex justify-center space-x-2">
+                            <a href="{% url 'proveedores_editar' proveedor.id %}" class="btn btn-sm btn-primary">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'proveedores_eliminar' proveedor.id %}" class="btn btn-sm btn-danger">
+                                🗑️ Eliminar
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state-cell">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🚚</div>
+                            <p class="empty-state-title">No hay proveedores registrados</p>
+                            <p class="empty-state-description">Comience creando un proveedor para sus compras</p>
+                            <a href="{% url 'proveedores_crear' %}" class="mt-4 btn btn-md btn-success">
+                                + Crear Primer Proveedor
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'components/pagination.html' with pagina=proveedores %}
+</div>
+{% endblock contenido %}

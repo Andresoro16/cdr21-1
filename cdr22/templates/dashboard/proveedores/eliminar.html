@@ -1,0 +1,68 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Eliminar Proveedor {% endblock header_title %}
+
+{% block contenido %}
+<div class="max-w-2xl mx-auto">
+    {% include 'components/dashboard/page_header.html' with titulo="Eliminar Proveedor" descripcion="Las compras asociadas quedarán sin proveedor" %}
+
+    <div class="bg-white rounded-lg shadow p-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <div class="text-red-600 text-2xl">⚠️</div>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-red-800">Confirmar Eliminación</h3>
+                    <p class="mt-2 text-sm text-red-700">
+                        ¿Está seguro de que desea eliminar este proveedor? Las compras relacionadas no se eliminarán.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4">Información del Proveedor</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Nombre:</span>
+                    <p class="text-sm">{{ proveedor.nombre }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Documento:</span>
+                    <p class="text-sm">{{ proveedor.documento|default:"No especificado" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Correo:</span>
+                    <p class="text-sm">{{ proveedor.email|default:"No especificado" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Teléfono:</span>
+                    <p class="text-sm">{{ proveedor.telefono|default:"No especificado" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Compras asociadas:</span>
+                    <p class="text-sm">{{ proveedor.compras_count }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-600">Dirección:</span>
+                    <p class="text-sm">{{ proveedor.direccion|default:"No especificada" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <button type="submit" class="formulario_boton" style="background-color: #dc2626; color: white;">
+                    🗑️ Eliminar Definitivamente
+                </button>
+                <a href="{% url 'proveedores_index' %}" class="formulario_boton" style="background-color: #6c757d; color: white; text-decoration: none; text-align: center;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

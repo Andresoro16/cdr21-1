@@ -45,6 +45,44 @@ Si Mailpit esta corriendo en la maquina host, el contenedor usa `host.docker.int
 ## Produccion
 - python manage.py tailwind build
 
+## Produccion con Docker / Coolify
+
+Archivos de produccion:
+
+```text
+Dockerfile.prod
+docker-compose.prod.yml
+docker/nginx/default.conf
+scripts/post-deploy.sh
+```
+
+En Coolify, usar `docker-compose.prod.yml` y publicar el servicio `nginx` en el puerto interno `80`.
+
+Variables minimas recomendadas:
+
+```env
+DJANGO_DEBUG=False
+SECRET_KEY=valor-seguro
+ALLOWED_HOSTS=midominio.com,www.midominio.com
+CSRF_TRUSTED_ORIGINS=https://midominio.com,https://www.midominio.com
+```
+
+Despues de cada deploy, ejecutar dentro del servicio `web`:
+
+```bash
+./scripts/post-deploy.sh
+```
+
+Ese script corre:
+
+```bash
+python manage.py migrate --noinput
+python manage.py tailwind build
+python manage.py collectstatic --noinput
+```
+
+Por ahora produccion usa SQLite persistente en el volumen `cdr22-data` y archivos subidos en `cdr22-media`.
+
 ## Cambios para las variables CSS
 
 ## Tests E2E con Playwright

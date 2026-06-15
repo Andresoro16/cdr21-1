@@ -38,6 +38,11 @@ urlpatterns =[
     path('dashboard/clientes/editar/<int:cliente_id>/', views.clientes_editar, name='clientes_editar'),
     path('dashboard/clientes/eliminar/<int:cliente_id>/', views.clientes_eliminar, name='clientes_eliminar'),
 
+    path('dashboard/proveedores/', views.proveedores_index, name='proveedores_index'),
+    path('dashboard/proveedores/crear/', views.proveedores_crear, name='proveedores_crear'),
+    path('dashboard/proveedores/editar/<int:proveedor_id>/', views.proveedores_editar, name='proveedores_editar'),
+    path('dashboard/proveedores/eliminar/<int:proveedor_id>/', views.proveedores_eliminar, name='proveedores_eliminar'),
+
     path('dashboard/usuarios/', views.usuarios_index, name='usuarios_index'),
     path('dashboard/usuarios/crear/', views.usuarios_crear, name='usuarios_crear'),
     path('dashboard/configuracion/general/', views.configuracion_general, name='configuracion_general'),

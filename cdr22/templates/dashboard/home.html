@@ -1,7 +1,220 @@
 {% extends 'autenticado.html' %}
+{% load formatters %}
 
-{% block header_title %} Home {% endblock header_title %}
+{% block header_title %} Inicio {% endblock header_title %}
 
 {% block contenido %}
-    Hola !
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Resumen Operativo" descripcion="Vista rápida de ventas, compras e inventario para la operación diaria" %}
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="summary-card">
+            <p class="summary-label">Ventas de hoy</p>
+            <p class="summary-value text-2xl">{{ ventas_hoy_total|money }}</p>
+            <p class="section-description mt-2">{{ ventas_hoy_count }} venta{{ ventas_hoy_count|pluralize }} registrada{{ ventas_hoy_count|pluralize }}</p>
+        </div>
+
+        <div class="summary-card">
+            <p class="summary-label">Ticket promedio</p>
+            <p class="summary-value text-2xl">{{ ticket_promedio|money }}</p>
+            <p class="section-description mt-2">{{ hoy|date:"d/m/Y" }}</p>
+        </div>
+
+        <div class="summary-card">
+            <p class="summary-label">Compras pendientes</p>
+            <p class="summary-value text-2xl">{{ compras_stock_pendiente_count }}</p>
+            <p class="section-description mt-2">{{ compras_en_espera_count }} en espera</p>
+        </div>
+
+        <div class="summary-card">
+            <p class="summary-label">Inventario crítico</p>
+            <p class="summary-value text-2xl">{{ productos_stock_bajo_count }}</p>
+            <p class="section-description mt-2">{{ productos_sin_stock_count }} sin stock</p>
+        </div>
+    </section>
+
+    <section class="dashboard-card mb-6">
+        <div class="dashboard-card-header">
+            <h2 class="section-title">Acciones rápidas</h2>
+            <p class="section-description">Tareas frecuentes para continuar la operación</p>
+        </div>
+        <div class="dashboard-card-body">
+            <div class="flex flex-wrap gap-3">
+                <a href="{% url 'pos' %}" class="btn btn-md btn-success">Nueva venta</a>
+                <a href="{% url 'compras_crear' %}" class="btn btn-md btn-primary">Registrar compra</a>
+                <a href="{% url 'productos_crear' %}" class="btn btn-md btn-secondary">Crear producto</a>
+                <a href="{% url 'clientes_crear' %}" class="btn btn-md btn-secondary">Crear cliente</a>
+                <a href="{% url 'proveedores_crear' %}" class="btn btn-md btn-secondary">Crear proveedor</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="summary-card">
+            <p class="summary-label">Productos activos</p>
+            <p class="summary-value text-2xl">{{ productos_activos_count }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-label">Productos sin categoría</p>
+            <p class="summary-value text-2xl">{{ productos_sin_categoria_count }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="summary-label">Compras por recibir stock</p>
+            <p class="summary-value text-2xl">{{ compras_stock_pendiente_count }}</p>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+        <div>
+            <div class="mb-3">
+                <h2 class="section-title">Stock crítico</h2>
+                <p class="section-description">Productos activos en o por debajo del mínimo configurado</p>
+            </div>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead class="data-table-head">
+                        <tr>
+                            <th class="table-header">Producto</th>
+                            <th class="table-header">Categoría</th>
+                            <th class="table-header">Stock</th>
+                            <th class="table-header">Mínimo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in stock_critico %}
+                        <tr class="data-table-row">
+                            <td class="table-data font-medium">{{ producto.nombre }}</td>
+                            <td class="table-data">
+                                {% if producto.categoria %}
+                                    {{ producto.categoria.nombre }}
+                                {% else %}
+                                    <span class="text-gray-400">Sin categoría</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-data">
+                                <span class="{% if producto.stock == 0 %}text-red-700 font-semibold{% else %}text-yellow-700 font-semibold{% endif %}">
+                                    {{ producto.stock }}
+                                </span>
+                            </td>
+                            <td class="table-data">{{ producto.stock_minimo }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-state-cell">
+                                <div class="empty-state">
+                                    <p class="empty-state-title">Inventario estable</p>
+                                    <p class="empty-state-description">No hay productos activos por debajo del mínimo.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <div class="mb-3">
+                <h2 class="section-title">Últimas compras</h2>
+                <p class="section-description">Movimientos recientes que pueden impactar inventario</p>
+            </div>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead class="data-table-head">
+                        <tr>
+                            <th class="table-header">Fecha</th>
+                            <th class="table-header">Proveedor</th>
+                            <th class="table-header">Total</th>
+                            <th class="table-header">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for compra in ultimas_compras %}
+                        <tr class="data-table-row">
+                            <td class="table-data">{{ compra.fecha_compra }}</td>
+                            <td class="table-data font-medium">
+                                {% if compra.proveedor %}
+                                    {{ compra.proveedor.nombre }}
+                                {% else %}
+                                    <span class="text-gray-400">Sin proveedor</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-data font-semibold">{{ compra.total|money }}</td>
+                            <td class="table-data">
+                                <span class="status-badge
+                                    {% if compra.estado == 'completada' %}status-badge-success
+                                    {% elif compra.estado == 'en_espera' %}status-badge-warning
+                                    {% elif compra.estado == 'anulada' %}status-badge-danger
+                                    {% else %}status-badge-muted{% endif %}">
+                                    {{ compra.get_estado_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-state-cell">
+                                <div class="empty-state">
+                                    <p class="empty-state-title">Sin compras recientes</p>
+                                    <p class="empty-state-description">Registre una compra para alimentar el inventario.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="mb-3">
+            <h2 class="section-title">Últimas ventas</h2>
+            <p class="section-description">Actividad comercial registrada recientemente</p>
+        </div>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead class="data-table-head">
+                    <tr>
+                        <th class="table-header">Fecha</th>
+                        <th class="table-header">Cliente</th>
+                        <th class="table-header">Total</th>
+                        <th class="table-header">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ultimas_ventas %}
+                    <tr class="data-table-row">
+                        <td class="table-data">{{ venta.created_at|date:"Y-m-d H:i" }}</td>
+                        <td class="table-data font-medium">
+                            {% if venta.cliente %}
+                                {{ venta.cliente.nombre }} {{ venta.cliente.apellidos }}
+                            {% else %}
+                                <span class="text-gray-400">Sin cliente</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-data font-semibold text-green-700">{{ venta.precio_total|money }}</td>
+                        <td class="table-data">
+                            <span class="status-badge
+                                {% if venta.estado == 'completada' %}status-badge-success
+                                {% elif venta.estado == 'pendiente' %}status-badge-warning
+                                {% else %}status-badge-danger{% endif %}">
+                                {{ venta.get_estado_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="empty-state-cell">
+                            <div class="empty-state">
+                                <p class="empty-state-title">Sin ventas recientes</p>
+                                <p class="empty-state-description">Use el punto de venta para registrar la primera venta.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
 {% endblock contenido %}
