@@ -1,0 +1,22 @@
+<script>
+    document.querySelectorAll('.estado-menu-button').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const menu = button.nextElementSibling;
+
+            document.querySelectorAll('.estado-menu').forEach((currentMenu) => {
+                if (currentMenu !== menu) {
+                    currentMenu.classList.add('hidden');
+                }
+            });
+
+            menu.classList.toggle('hidden');
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.estado-menu').forEach((menu) => {
+            menu.classList.add('hidden');
+        });
+    });
+</script>

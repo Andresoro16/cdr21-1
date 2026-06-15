@@ -58,78 +58,11 @@
                         {% endif %}
                     </td>
                     <td class="table-data">
-                        <div class="relative inline-block text-left">
-                            {% if compra.estado == 'borrador' %}
-                                <button type="button" class="estado-menu-button px-3 py-2 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
-                                    Cambiar estado
-                                </button>
-                                <div class="estado-menu hidden absolute right-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                                    <div class="py-1">
-                                        <form method="POST" action="{% url 'compras_cambiar_estado' compra.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="en_espera">
-                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-yellow-800 hover:bg-yellow-50">
-                                                Pasar a espera
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{% url 'compras_cambiar_estado' compra.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="completada">
-                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-green-800 hover:bg-green-50">
-                                                Completar compra
-                                            </button>
-                                        </form>
-                                        <button
-                                            type="button"
-                                            class="block w-full px-4 py-2 text-left text-sm text-red-800 hover:bg-red-50"
-                                            data-confirm-modal="anular-compra-modal"
-                                            data-action="{% url 'compras_cambiar_estado' compra.id %}"
-                                            data-estado="anulada"
-                                            data-title="Anular compra"
-                                            data-description="Esta compra quedará marcada como anulada y no afectará el stock."
-                                            data-confirm-text="Anular compra"
-                                        >
-                                            Anular compra
-                                        </button>
-                                    </div>
-                                </div>
-                            {% elif compra.estado == 'en_espera' %}
-                                <button type="button" class="estado-menu-button px-3 py-2 rounded text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
-                                    Cambiar estado
-                                </button>
-                                <div class="estado-menu hidden absolute right-0 z-10 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                                    <div class="py-1">
-                                        <form method="POST" action="{% url 'compras_cambiar_estado' compra.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="borrador">
-                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-50">
-                                                Volver a borrador
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{% url 'compras_cambiar_estado' compra.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="completada">
-                                            <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-green-800 hover:bg-green-50">
-                                                Completar compra
-                                            </button>
-                                        </form>
-                                        <button
-                                            type="button"
-                                            class="block w-full px-4 py-2 text-left text-sm text-red-800 hover:bg-red-50"
-                                            data-confirm-modal="anular-compra-modal"
-                                            data-action="{% url 'compras_cambiar_estado' compra.id %}"
-                                            data-estado="anulada"
-                                            data-title="Anular compra"
-                                            data-description="Esta compra quedará marcada como anulada y no afectará el stock."
-                                            data-confirm-text="Anular compra"
-                                        >
-                                            Anular compra
-                                        </button>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <span class="text-sm text-gray-500">Sin acciones</span>
-                            {% endif %}
+                        <div class="flex flex-wrap items-center gap-2">
+                            <a href="{% url 'compras_detalle' compra.id %}" class="px-3 py-2 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                Ver
+                            </a>
+                            {% include 'dashboard/compras/_acciones_estado.html' %}
                         </div>
                     </td>
                 </tr>
@@ -156,26 +89,5 @@
 
 {% include 'components/confirm_modal.html' with modal_id='anular-compra-modal' %}
 
-<script>
-    document.querySelectorAll('.estado-menu-button').forEach((button) => {
-        button.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const menu = button.nextElementSibling;
-
-            document.querySelectorAll('.estado-menu').forEach((currentMenu) => {
-                if (currentMenu !== menu) {
-                    currentMenu.classList.add('hidden');
-                }
-            });
-
-            menu.classList.toggle('hidden');
-        });
-    });
-
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.estado-menu').forEach((menu) => {
-            menu.classList.add('hidden');
-        });
-    });
-</script>
+{% include 'dashboard/compras/_estado_menu_script.html' %}
 {% endblock contenido %}

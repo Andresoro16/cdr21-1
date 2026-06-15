@@ -283,6 +283,15 @@ def compras_index(request):
     return render(request, 'dashboard/compras/index.html', {'compras': compras})
 
 @login_required(login_url='login')
+def compras_detalle(request, compra_id):
+    compra = get_object_or_404(
+        Compra.objects.select_related('proveedor').prefetch_related('items__producto'),
+        id=compra_id
+    )
+
+    return render(request, 'dashboard/compras/detalle.html', {'compra': compra})
+
+@login_required(login_url='login')
 def compras_crear(request):
     productos = Producto.objects.filter(estado='activo').order_by('nombre')
     proveedores = Proveedor.objects.all()
