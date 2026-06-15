@@ -11,6 +11,13 @@ class ConfiguracionSistema(models.Model):
     ]
 
     nombre_empresa = models.CharField(max_length=150, default='Las Motos')
+    nit_empresa = models.CharField(max_length=50, blank=True, null=True)
+    direccion_empresa = models.CharField(max_length=255, blank=True, null=True)
+    ciudad_empresa = models.CharField(max_length=100, blank=True, null=True)
+    pais_empresa = models.CharField(max_length=100, blank=True, null=True, default='Colombia')
+    telefono_empresa = models.CharField(max_length=30, blank=True, null=True)
+    email_empresa = models.EmailField(blank=True, null=True)
+    logo = models.ImageField(upload_to='empresa/logos/', blank=True, null=True)
     prefijo_factura = models.CharField(max_length=10, default='FAC')
     siguiente_numero_factura = models.PositiveIntegerField(default=1)
     impuesto_porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=0)

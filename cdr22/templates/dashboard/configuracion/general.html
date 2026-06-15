@@ -7,7 +7,7 @@
 <div class="dashboard-container">
     {% include 'components/dashboard/page_header.html' with titulo="Configuración General" descripcion="Administre datos generales, numeración de facturas e impuesto base del sistema" %}
 
-    <form method="POST" class="dashboard-card p-8">
+    <form method="POST" enctype="multipart/form-data" class="dashboard-card p-8">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -21,6 +21,58 @@
                 <label class="formulario_label mb-2" for="{{ form.nombre_empresa.id_for_label }}">Nombre de la empresa *</label>
                 <input type="text" name="nombre_empresa" id="{{ form.nombre_empresa.id_for_label }}" value="{{ form.nombre_empresa.value|default:'' }}" class="formulario_input" required>
                 {% if form.nombre_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.nombre_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.nit_empresa.id_for_label }}">NIT / Identificación fiscal</label>
+                <input type="text" name="nit_empresa" id="{{ form.nit_empresa.id_for_label }}" value="{{ form.nit_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.nit_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.nit_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.telefono_empresa.id_for_label }}">Teléfono</label>
+                <input type="text" name="telefono_empresa" id="{{ form.telefono_empresa.id_for_label }}" value="{{ form.telefono_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.telefono_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.telefono_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col md:col-span-2">
+                <label class="formulario_label mb-2" for="{{ form.direccion_empresa.id_for_label }}">Dirección</label>
+                <input type="text" name="direccion_empresa" id="{{ form.direccion_empresa.id_for_label }}" value="{{ form.direccion_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.direccion_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.direccion_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.ciudad_empresa.id_for_label }}">Ciudad</label>
+                <input type="text" name="ciudad_empresa" id="{{ form.ciudad_empresa.id_for_label }}" value="{{ form.ciudad_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.ciudad_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.ciudad_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.pais_empresa.id_for_label }}">País</label>
+                <input type="text" name="pais_empresa" id="{{ form.pais_empresa.id_for_label }}" value="{{ form.pais_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.pais_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.pais_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col md:col-span-2">
+                <label class="formulario_label mb-2" for="{{ form.email_empresa.id_for_label }}">Correo de la empresa</label>
+                <input type="email" name="email_empresa" id="{{ form.email_empresa.id_for_label }}" value="{{ form.email_empresa.value|default:'' }}" class="formulario_input">
+                {% if form.email_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.email_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col md:col-span-2">
+                <label class="formulario_label mb-2" for="{{ form.logo.id_for_label }}">Logo de la empresa</label>
+                {% if form.instance.logo %}
+                    <div class="mb-3 flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <img src="{{ form.instance.logo.url }}" alt="{{ form.instance.nombre_empresa }}" class="h-16 w-16 rounded-md object-contain bg-white">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Logo actual</p>
+                            <p class="text-xs text-gray-500">{{ form.instance.logo.name }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+                <input type="file" name="logo" id="{{ form.logo.id_for_label }}" accept="image/png,image/jpeg,image/webp" class="formulario_input">
+                <p class="mt-2 text-sm text-gray-500">Use JPG, PNG o WebP. Tamaño máximo: 2 MB.</p>
+                {% if form.logo.errors %}<p class="mt-2 text-sm text-red-600">{{ form.logo.errors.0 }}</p>{% endif %}
             </div>
 
             <div class="flex flex-col">

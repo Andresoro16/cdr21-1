@@ -377,7 +377,7 @@ def configuracion_general(request):
     configuracion = get_configuracion_sistema()
 
     if request.method == 'POST':
-        form = ConfiguracionSistemaForm(request.POST, instance=configuracion)
+        form = ConfiguracionSistemaForm(request.POST, request.FILES, instance=configuracion)
         if form.is_valid():
             form.save()
             messages.success(request, 'Configuración actualizada correctamente.')

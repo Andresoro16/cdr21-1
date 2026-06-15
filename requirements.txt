@@ -24,6 +24,7 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 packaging==26.2
+Pillow==12.2.0
 playwright==1.60.0
 pluggy==1.6.0
 pyee==13.0.1

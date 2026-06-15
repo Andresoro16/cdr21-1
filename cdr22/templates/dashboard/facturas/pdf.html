@@ -1,4 +1,5 @@
 {% load formatters %}
+{% load static %}
 <!doctype html>
 <html lang="es">
 <head>
@@ -30,6 +31,18 @@
             font-size: 24px;
             font-weight: 700;
             margin: 0 0 6px;
+        }
+
+        .brand {
+            align-items: center;
+            display: flex;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            height: 56px;
+            object-fit: contain;
+            width: 56px;
         }
 
         .muted {
@@ -121,9 +134,33 @@
 </head>
 <body>
     <header class="header">
-        <div>
-            <h1 class="company-name">{{ configuracion.nombre_empresa }}</h1>
-            <p class="field muted">Factura de venta</p>
+        <div class="brand">
+            {% if configuracion.logo %}
+                <img class="brand-logo" src="{{ configuracion.logo.url }}" alt="{{ configuracion.nombre_empresa }}">
+            {% else %}
+                <img class="brand-logo" src="{% static 'img/logo_las_motos.jpeg' %}" alt="{{ configuracion.nombre_empresa }}">
+            {% endif %}
+            <div>
+                <h1 class="company-name">{{ configuracion.nombre_empresa }}</h1>
+                {% if configuracion.nit_empresa %}
+                    <p class="field">NIT: {{ configuracion.nit_empresa }}</p>
+                {% endif %}
+                {% if configuracion.direccion_empresa %}
+                    <p class="field muted">{{ configuracion.direccion_empresa }}</p>
+                {% endif %}
+                <p class="field muted">
+                    {% if configuracion.ciudad_empresa %}{{ configuracion.ciudad_empresa }}{% endif %}
+                    {% if configuracion.ciudad_empresa and configuracion.pais_empresa %}, {% endif %}
+                    {% if configuracion.pais_empresa %}{{ configuracion.pais_empresa }}{% endif %}
+                </p>
+                {% if configuracion.telefono_empresa or configuracion.email_empresa %}
+                    <p class="field muted">
+                        {% if configuracion.telefono_empresa %}Tel: {{ configuracion.telefono_empresa }}{% endif %}
+                        {% if configuracion.telefono_empresa and configuracion.email_empresa %} | {% endif %}
+                        {% if configuracion.email_empresa %}{{ configuracion.email_empresa }}{% endif %}
+                    </p>
+                {% endif %}
+            </div>
         </div>
 
         <div class="invoice-box">
@@ -146,7 +183,7 @@
         </div>
 
         <div class="panel">
-            <h2 class="section-title">Venta</h2>
+            <h2 class="section-title">Factura</h2>
             <p class="field">Orden: #{{ orden.id }}</p>
             <p class="field">Método de pago: {{ orden.metodo_pago|default:"-" }}</p>
             <p class="field">Estado: {{ orden.get_estado_display }}</p>

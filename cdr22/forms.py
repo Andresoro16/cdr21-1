@@ -74,11 +74,36 @@ class ConfiguracionSistemaForm(forms.ModelForm):
         model = ConfiguracionSistema
         fields = [
             'nombre_empresa',
+            'nit_empresa',
+            'direccion_empresa',
+            'ciudad_empresa',
+            'pais_empresa',
+            'telefono_empresa',
+            'email_empresa',
+            'logo',
             'prefijo_factura',
             'siguiente_numero_factura',
             'impuesto_porcentaje',
             'moneda',
         ]
+
+    def clean_nit_empresa(self):
+        nit = self.cleaned_data.get('nit_empresa') or ''
+        return nit.strip()
+
+    def clean_logo(self):
+        logo = self.cleaned_data.get('logo')
+        if not logo:
+            return logo
+
+        if logo.size > 2 * 1024 * 1024:
+            raise ValidationError('El logo no debe superar 2 MB.')
+
+        allowed_content_types = ['image/jpeg', 'image/png', 'image/webp']
+        if hasattr(logo, 'content_type') and logo.content_type not in allowed_content_types:
+            raise ValidationError('Use una imagen JPG, PNG o WebP.')
+
+        return logo
 
     def clean_prefijo_factura(self):
         prefijo = self.cleaned_data['prefijo_factura'].strip().upper()

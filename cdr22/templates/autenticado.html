@@ -29,7 +29,11 @@
             </label>
             <!-- Logo -->
             <div class="auth_header_logo_container">
-                <img   src="{% static '/img/logo_las_motos.jpeg' %}" alt="Logo Las Motos">
+                {% if configuracion_sistema.logo %}
+                    <img src="{{ configuracion_sistema.logo.url }}" alt="{{ configuracion_sistema.nombre_empresa }}">
+                {% else %}
+                    <img src="{% static 'img/logo_las_motos.jpeg' %}" alt="{{ configuracion_sistema.nombre_empresa }}">
+                {% endif %}
             </div>
             <nav class="auth_nav">
                  <label for="auth_menu-toggle" class="close_button text-secondary-foreground cursor-pointer hover:bg-secondary-foreground hover:text-secondary md:hidden w-max rounded-full">{% include "components/icons/x.html" %}</label>
