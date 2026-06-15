@@ -163,5 +163,18 @@ class CompraReadSerializer(serializers.ModelSerializer):
             'estado_display',
             'stock_aplicado',
             'observaciones',
+            'motivo_anulacion',
+            'anulada_en',
             'created_at',
         ]
+
+
+class CompraEstadoSerializer(serializers.Serializer):
+    estado = serializers.ChoiceField(
+        choices=Compra.ESTADO_CHOICES,
+        error_messages={
+            'invalid_choice': 'Seleccione un estado válido.',
+            'required': 'Seleccione el nuevo estado.',
+        }
+    )
+    motivo_anulacion = serializers.CharField(required=False, allow_blank=True)

@@ -6,8 +6,8 @@ from django.utils.decorators import method_decorator
 from django.db import models, transaction
 from .api_responses import error_response, success_response, validation_error_response
 from .models import Compra, Orden, Producto, Cliente
-from .serializers import CompraCreateSerializer, CompraReadSerializer, OrdenSerializer, OrdenReadSerializer
-from .services.compras import crear_compra
+from .serializers import CompraCreateSerializer, CompraEstadoSerializer, CompraReadSerializer, OrdenSerializer, OrdenReadSerializer
+from .services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
 
 # class Authentication: 
@@ -390,4 +390,38 @@ class ComprasAPIView(View):
             "Compra creada exitosamente",
             data={"compra": read_serializer.data},
             status=201
+        )
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CompraEstadoAPIView(View):
+    def patch(self, request, compra_id):
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return error_response("Mensaje inválido, debe ser JSON", status=400)
+
+        try:
+            compra = Compra.objects.get(id=compra_id)
+        except Compra.DoesNotExist:
+            return error_response("Compra no encontrada", status=404)
+
+        serializer = CompraEstadoSerializer(data=data)
+        if not serializer.is_valid():
+            return validation_error_response(serializer.errors)
+
+        try:
+            if serializer.validated_data['estado'] == 'anulada':
+                compra = anular_compra(
+                    compra,
+                    motivo=serializer.validated_data.get('motivo_anulacion', '')
+                )
+            else:
+                compra = cambiar_estado_compra(compra, serializer.validated_data['estado'])
+        except CompraEstadoError as e:
+            return validation_error_response(e.errores)
+
+        read_serializer = CompraReadSerializer(compra)
+        return success_response(
+            "Estado de compra actualizado correctamente",
+            data={"compra": read_serializer.data}
         )

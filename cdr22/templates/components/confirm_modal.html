@@ -1,0 +1,68 @@
+<div id="{{ modal_id|default:'confirm-modal' }}" class="confirm-modal hidden fixed inset-0 z-50">
+    <div class="confirm-modal-overlay absolute inset-0 bg-black/40"></div>
+    <div class="relative mx-auto flex min-h-screen max-w-lg items-center px-4">
+        <div class="w-full rounded-lg bg-white shadow-xl">
+            <div class="border-b px-6 py-4">
+                <h2 class="confirm-modal-title text-lg font-semibold text-gray-900">Confirmar acción</h2>
+                <p class="confirm-modal-description mt-1 text-sm text-gray-600"></p>
+            </div>
+
+            <form method="POST" class="confirm-modal-form">
+                {% csrf_token %}
+                <input type="hidden" name="estado" class="confirm-modal-estado">
+
+                <div class="px-6 py-4">
+                    <label class="confirm-modal-reason-label formulario_label mb-2 block" for="{{ modal_id|default:'confirm-modal' }}-reason">
+                        Motivo
+                    </label>
+                    <textarea
+                        id="{{ modal_id|default:'confirm-modal' }}-reason"
+                        name="motivo_anulacion"
+                        rows="4"
+                        class="confirm-modal-reason formulario_input w-full"
+                        placeholder="Escribe un motivo para dejar registro"
+                    ></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t px-6 py-4">
+                    <button type="button" class="confirm-modal-cancel formulario_boton bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="confirm-modal-submit formulario_boton bg-red-600 text-white hover:bg-red-700">
+                        Confirmar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('[data-confirm-modal]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const modal = document.getElementById(button.dataset.confirmModal);
+            const form = modal.querySelector('.confirm-modal-form');
+            const title = modal.querySelector('.confirm-modal-title');
+            const description = modal.querySelector('.confirm-modal-description');
+            const estado = modal.querySelector('.confirm-modal-estado');
+            const submit = modal.querySelector('.confirm-modal-submit');
+            const reason = modal.querySelector('.confirm-modal-reason');
+
+            form.action = button.dataset.action;
+            title.textContent = button.dataset.title || 'Confirmar acción';
+            description.textContent = button.dataset.description || '';
+            estado.value = button.dataset.estado || '';
+            submit.textContent = button.dataset.confirmText || 'Confirmar';
+            reason.value = '';
+
+            modal.classList.remove('hidden');
+        });
+    });
+
+    document.querySelectorAll('.confirm-modal').forEach((modal) => {
+        const closeModal = () => modal.classList.add('hidden');
+
+        modal.querySelector('.confirm-modal-cancel').addEventListener('click', closeModal);
+        modal.querySelector('.confirm-modal-overlay').addEventListener('click', closeModal);
+    });
+</script>

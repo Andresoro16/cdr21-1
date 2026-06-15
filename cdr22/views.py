@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.contrib import messages
 from cdr22.models import Producto, Categoria, Cliente, Compra, Proveedor
 from cdr22.serializers import CompraCreateSerializer
-from cdr22.services.compras import crear_compra
+from cdr22.services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
 
 
@@ -305,3 +306,25 @@ def compras_crear(request):
         'productos': productos,
         'proveedores': proveedores,
     })
+
+@login_required(login_url='login')
+def compras_cambiar_estado(request, compra_id):
+    compra = get_object_or_404(Compra, id=compra_id)
+
+    if request.method != 'POST':
+        return redirect('compras_index')
+
+    nuevo_estado = request.POST.get('estado')
+    motivo_anulacion = request.POST.get('motivo_anulacion', '').strip()
+
+    try:
+        if nuevo_estado == 'anulada':
+            anular_compra(compra, motivo=motivo_anulacion)
+        else:
+            cambiar_estado_compra(compra, nuevo_estado)
+        messages.success(request, 'Estado de la compra actualizado correctamente.')
+    except CompraEstadoError as e:
+        primer_error = next(iter(e.errores.values()))[0]
+        messages.error(request, primer_error)
+
+    return redirect('compras_index')

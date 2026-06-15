@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # ============================================
 # CLIENTES
@@ -198,6 +199,7 @@ class Compra(models.Model):
         ('borrador', 'Borrador'),
         ('en_espera', 'En espera'),
         ('completada', 'Completada'),
+        ('anulada', 'Anulada'),
     ]
     METODO_PAGO_CHOICES = [
         ('efectivo', 'Efectivo'),
@@ -217,6 +219,8 @@ class Compra(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='borrador')
     stock_aplicado = models.BooleanField(default=False)
     observaciones = models.TextField(blank=True, null=True)
+    motivo_anulacion = models.TextField(blank=True, null=True)
+    anulada_en = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -239,6 +243,12 @@ class Compra(models.Model):
 
         self.stock_aplicado = True
         self.save(update_fields=['stock_aplicado', 'updated_at'])
+
+    def anular(self, motivo=''):
+        self.estado = 'anulada'
+        self.motivo_anulacion = motivo
+        self.anulada_en = timezone.now()
+        self.save(update_fields=['estado', 'motivo_anulacion', 'anulada_en', 'updated_at'])
 
 class CompraItem(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.CASCADE, related_name='items')

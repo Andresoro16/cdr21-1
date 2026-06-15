@@ -10,4 +10,5 @@ urlpatterns = [
     path('clientes/create/', api_views.ClienteCreateAPIView.as_view(), name='api.clientes.create'),
     path('ordenes/create/', api_views.OrdenCreateAPIView.as_view(), name='api.ordenes.create'),
     path('compras/', api_views.ComprasAPIView.as_view(), name='api.compras'),
+    path('compras/<int:compra_id>/estado/', api_views.CompraEstadoAPIView.as_view(), name='api.compras.estado'),
 ]
