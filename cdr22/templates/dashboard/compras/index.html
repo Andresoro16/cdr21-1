@@ -7,16 +7,6 @@
 <div class="max-w-7xl mx-auto">
     {% include 'components/dashboard/page_header.html' with titulo="Gestión de Compras" descripcion="Registre compras, controle recepciones y mantenga el historial de stock" %}
 
-    {% if messages %}
-        <div class="mb-6 space-y-2">
-            {% for message in messages %}
-                <div class="rounded-lg px-4 py-3 {% if message.tags == 'success' %}border border-green-200 bg-green-50 text-green-700{% else %}border border-red-200 bg-red-50 text-red-700{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
     <div class="flex justify-end mb-6">
         <a href="{% url 'compras_crear' %}" class="formulario_boton formulario_boton_verde">
             + Crear Compra

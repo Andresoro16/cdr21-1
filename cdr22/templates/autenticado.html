@@ -101,5 +101,22 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="{% static 'js/notifications.js' %}"></script>
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        Notify.success('{{ message|escapejs }}');
+                    {% elif message.tags == 'error' %}
+                        Notify.error('{{ message|escapejs }}');
+                    {% elif message.tags == 'warning' %}
+                        Notify.warning('{{ message|escapejs }}');
+                    {% else %}
+                        Notify.info('{{ message|escapejs }}');
+                    {% endif %}
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
 </body>
 </html>
