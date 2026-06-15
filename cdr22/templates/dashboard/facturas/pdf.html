@@ -8,7 +8,7 @@
     <style>
         @page {
             size: letter;
-            margin: 18mm;
+            margin: 18mm 18mm 28mm;
         }
 
         body {
@@ -130,9 +130,50 @@
             margin-top: 6px;
             padding-top: 10px;
         }
+
+        .footer {
+            border-top: 1px solid #d1d5db;
+            bottom: -20mm;
+            color: #6b7280;
+            font-size: 10px;
+            left: 0;
+            line-height: 1.35;
+            padding-top: 6px;
+            position: fixed;
+            right: 0;
+        }
+
+        .footer-content {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .footer-company {
+            max-width: 78%;
+        }
+
+        .footer-page::after {
+            content: "Página " counter(page) " de " counter(pages);
+        }
     </style>
 </head>
 <body>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-company">
+                <strong>{{ configuracion.nombre_empresa }}</strong>
+                {% if configuracion.nit_empresa %} | NIT: {{ configuracion.nit_empresa }}{% endif %}
+                {% if configuracion.direccion_empresa %} | {{ configuracion.direccion_empresa }}{% endif %}
+                {% if configuracion.ciudad_empresa %} | {{ configuracion.ciudad_empresa }}{% endif %}
+                {% if configuracion.pais_empresa %}, {{ configuracion.pais_empresa }}{% endif %}
+                {% if configuracion.telefono_empresa %} | Tel: {{ configuracion.telefono_empresa }}{% endif %}
+                {% if configuracion.email_empresa %} | {{ configuracion.email_empresa }}{% endif %}
+            </div>
+            <div class="footer-page"></div>
+        </div>
+    </footer>
+
     <header class="header">
         <div class="brand">
             {% if configuracion.logo %}

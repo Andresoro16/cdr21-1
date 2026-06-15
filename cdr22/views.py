@@ -382,6 +382,7 @@ def configuracion_general(request):
             form.save()
             messages.success(request, 'Configuración actualizada correctamente.')
             return redirect('configuracion_general')
+        messages.error(request, 'No se pudo guardar la configuración. Revise los campos marcados.')
     else:
         form = ConfiguracionSistemaForm(instance=configuracion)
 

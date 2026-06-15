@@ -99,10 +99,6 @@ class ConfiguracionSistemaForm(forms.ModelForm):
         if logo.size > 2 * 1024 * 1024:
             raise ValidationError('El logo no debe superar 2 MB.')
 
-        allowed_content_types = ['image/jpeg', 'image/png', 'image/webp']
-        if hasattr(logo, 'content_type') and logo.content_type not in allowed_content_types:
-            raise ValidationError('Use una imagen JPG, PNG o WebP.')
-
         return logo
 
     def clean_prefijo_factura(self):
