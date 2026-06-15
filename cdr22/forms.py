@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
+from cdr22.models import ConfiguracionSistema
 from cdr22.roles import ROLE_NAMES
 
 
@@ -66,3 +67,33 @@ class UsuarioCreateForm(forms.Form):
             self.add_error('is_active', 'El usuario debe estar activo para enviar el correo de configuración de contraseña.')
 
         return cleaned_data
+
+
+class ConfiguracionSistemaForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracionSistema
+        fields = [
+            'nombre_empresa',
+            'prefijo_factura',
+            'siguiente_numero_factura',
+            'impuesto_porcentaje',
+            'moneda',
+        ]
+
+    def clean_prefijo_factura(self):
+        prefijo = self.cleaned_data['prefijo_factura'].strip().upper()
+        if not prefijo:
+            raise ValidationError('Ingrese un prefijo de factura.')
+        return prefijo
+
+    def clean_siguiente_numero_factura(self):
+        siguiente_numero = self.cleaned_data['siguiente_numero_factura']
+        if siguiente_numero < 1:
+            raise ValidationError('El siguiente número debe ser mayor o igual a 1.')
+        return siguiente_numero
+
+    def clean_impuesto_porcentaje(self):
+        impuesto = self.cleaned_data['impuesto_porcentaje']
+        if impuesto < 0:
+            raise ValidationError('El impuesto no puede ser negativo.')
+        return impuesto

@@ -1,0 +1,64 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Configuración General {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Configuración General" descripcion="Administre datos generales, numeración de facturas e impuesto base del sistema" %}
+
+    <form method="POST" class="dashboard-card p-8">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="flex flex-col md:col-span-2">
+                <label class="formulario_label mb-2" for="{{ form.nombre_empresa.id_for_label }}">Nombre de la empresa *</label>
+                <input type="text" name="nombre_empresa" id="{{ form.nombre_empresa.id_for_label }}" value="{{ form.nombre_empresa.value|default:'' }}" class="formulario_input" required>
+                {% if form.nombre_empresa.errors %}<p class="mt-2 text-sm text-red-600">{{ form.nombre_empresa.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.prefijo_factura.id_for_label }}">Prefijo de factura *</label>
+                <input type="text" name="prefijo_factura" id="{{ form.prefijo_factura.id_for_label }}" value="{{ form.prefijo_factura.value|default:'' }}" class="formulario_input" required>
+                <p class="mt-2 text-sm text-gray-500">Ejemplo: FAC genera números como FAC-000001.</p>
+                {% if form.prefijo_factura.errors %}<p class="mt-2 text-sm text-red-600">{{ form.prefijo_factura.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.siguiente_numero_factura.id_for_label }}">Siguiente número de factura *</label>
+                <input type="number" min="1" name="siguiente_numero_factura" id="{{ form.siguiente_numero_factura.id_for_label }}" value="{{ form.siguiente_numero_factura.value|default:'' }}" class="formulario_input" required>
+                <p class="mt-2 text-sm text-gray-500">Este contador aumenta automáticamente al crear una venta.</p>
+                {% if form.siguiente_numero_factura.errors %}<p class="mt-2 text-sm text-red-600">{{ form.siguiente_numero_factura.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.impuesto_porcentaje.id_for_label }}">Impuesto (%) *</label>
+                <input type="number" min="0" step="0.01" name="impuesto_porcentaje" id="{{ form.impuesto_porcentaje.id_for_label }}" value="{{ form.impuesto_porcentaje.value|default:'' }}" class="formulario_input" required>
+                {% if form.impuesto_porcentaje.errors %}<p class="mt-2 text-sm text-red-600">{{ form.impuesto_porcentaje.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <label class="formulario_label mb-2" for="{{ form.moneda.id_for_label }}">Moneda *</label>
+                <input type="text" name="moneda" id="{{ form.moneda.id_for_label }}" value="{{ form.moneda.value|default:'' }}" class="formulario_input" required>
+                <p class="mt-2 text-sm text-gray-500">Ejemplo: COP.</p>
+                {% if form.moneda.errors %}<p class="mt-2 text-sm text-red-600">{{ form.moneda.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="btn btn-md btn-success">
+                Guardar Configuración
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-md btn-secondary">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock contenido %}

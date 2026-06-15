@@ -8,10 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
 import secrets
-from cdr22.forms import UsuarioCreateForm
+from cdr22.forms import ConfiguracionSistemaForm, UsuarioCreateForm
 from cdr22.models import Producto, Categoria, Cliente, Compra, Orden, Proveedor
 from cdr22.roles import ROLE_NAMES, USER_MANAGER_ROLES
 from cdr22.serializers import CompraCreateSerializer
+from cdr22.services.configuracion import get_configuracion_sistema
 from cdr22.services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
 
@@ -366,6 +367,25 @@ def usuarios_crear(request):
         form = UsuarioCreateForm(initial={'password_mode': 'email', 'is_active': True})
 
     return render(request, 'dashboard/usuarios/crear.html', {'form': form})
+
+@login_required(login_url='login')
+def configuracion_general(request):
+    if not _can_manage_users(request.user):
+        messages.error(request, 'No tienes permisos para gestionar la configuración.')
+        return redirect('home')
+
+    configuracion = get_configuracion_sistema()
+
+    if request.method == 'POST':
+        form = ConfiguracionSistemaForm(request.POST, instance=configuracion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Configuración actualizada correctamente.')
+            return redirect('configuracion_general')
+    else:
+        form = ConfiguracionSistemaForm(instance=configuracion)
+
+    return render(request, 'dashboard/configuracion/general.html', {'form': form})
 
 @login_required(login_url='login')
 def compras_index(request):

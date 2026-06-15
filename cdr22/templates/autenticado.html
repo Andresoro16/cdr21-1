@@ -76,7 +76,7 @@
                             {% include "components/icons/chevron_down.html" %}
                         </button>
                         <div class="auth_nav_group_menu">
-                            <span class="auth_nav_group_link_disabled">General</span>
+                            <a class="auth_nav_group_link" href="{% url 'configuracion_general' %}">General</a>
                             <a class="auth_nav_group_link" href="{% url 'usuarios_index' %}">Usuarios</a>
                         </div>
                     </li>

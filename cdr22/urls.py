@@ -36,6 +36,7 @@ urlpatterns =[
 
     path('dashboard/usuarios/', views.usuarios_index, name='usuarios_index'),
     path('dashboard/usuarios/crear/', views.usuarios_crear, name='usuarios_crear'),
+    path('dashboard/configuracion/general/', views.configuracion_general, name='configuracion_general'),
 
     path('dashboard/compras/', views.compras_index, name='compras_index'),
     path('dashboard/compras/<int:compra_id>/', views.compras_detalle, name='compras_detalle'),

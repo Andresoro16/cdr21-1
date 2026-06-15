@@ -2,6 +2,28 @@ from django.db import models
 from django.utils import timezone
 
 # ============================================
+# CONFIGURACIÓN
+# ============================================
+
+class ConfiguracionSistema(models.Model):
+    nombre_empresa = models.CharField(max_length=150, default='Las Motos')
+    prefijo_factura = models.CharField(max_length=10, default='FAC')
+    siguiente_numero_factura = models.PositiveIntegerField(default=1)
+    impuesto_porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    moneda = models.CharField(max_length=10, default='COP')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'configuracion_sistema'
+        verbose_name = 'Configuración del sistema'
+        verbose_name_plural = 'Configuración del sistema'
+
+    def __str__(self):
+        return self.nombre_empresa
+
+# ============================================
 # CLIENTES
 # ============================================
 

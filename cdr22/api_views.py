@@ -7,6 +7,7 @@ from django.db import models, transaction
 from .api_responses import error_response, success_response, validation_error_response
 from .models import Compra, Orden, Producto, Cliente
 from .serializers import CompraCreateSerializer, CompraEstadoSerializer, CompraReadSerializer, OrdenSerializer, OrdenReadSerializer
+from .services.configuracion import generar_numero_factura
 from .services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
 
@@ -298,7 +299,7 @@ class OrdenCreateAPIView(View):
 
             with transaction.atomic():
                 # Crear factura
-                factura_numero = f"FAC-{Factura.objects.count() + 1:06d}"
+                factura_numero = generar_numero_factura()
 
                 factura = Factura.objects.create(
                     numero=factura_numero,
