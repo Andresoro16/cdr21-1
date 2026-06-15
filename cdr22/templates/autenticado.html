@@ -6,6 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% tailwind_css %}
+    <!-- Toastify JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="{% static 'css/toastify-custom.css' %}">
     <!-- <link rel="stylesheet" href="{% static 'css/base.css'%}">
     <link rel="stylesheet" href="{% static 'css/autenticado.css'%}"> -->
     {% block head %}
@@ -96,6 +99,7 @@
     <footer>
         <a href=""></a>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="{% static 'js/notifications.js' %}"></script>
 </body>
 </html>
-

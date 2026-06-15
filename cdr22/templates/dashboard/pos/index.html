@@ -175,7 +175,7 @@
         const cedula = cedulaInput.value.trim();
         
         if (!cedula) {
-            alert('Ingrese una cédula');
+            Notify.warning('Ingrese una cédula');
             return;
         }
 
@@ -189,14 +189,15 @@
                 document.getElementById('cliente_apellidos').value = data.cliente.apellidos;
                 document.getElementById('cliente_email').value = data.cliente.email || '';
                 document.getElementById('cliente_telefono').value = data.cliente.telefono || '';
+                Notify.success('Cliente encontrado ✅');
             } else {
                 // Cliente no encontrado
                 limpiarCliente();
-                alert('Cliente no encontrado. Complete los datos para crear uno nuevo.');
+                Notify.info('Cliente no encontrado. Complete los datos para crear uno nuevo.');
             }
         } catch (error) {
             console.error('Error al buscar cliente:', error);
-            alert('Error al buscar el cliente');
+            Notify.error('Error al buscar el cliente');
         }
     });
 
@@ -345,13 +346,13 @@
         // Validar que hay cliente
         const cedula = document.getElementById('cliente_cedula').value.trim();
         if (!cedula) {
-            alert('Ingrese una cédula del cliente');
+            Notify.warning('Ingrese una cédula del cliente');
             return;
         }
 
         // Validar que hay items en el carrito
         if (carrito.length === 0) {
-            alert('El carrito está vacío');
+            Notify.warning('El carrito está vacío');
             return;
         }
 
@@ -393,7 +394,7 @@
 
             if (response.ok) {
                 // Éxito
-                alert(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: $${data.orden.total}`);
+                Notify.success(`✅ Venta completada!\nFactura: ${data.orden.factura_numero}\nTotal: $${data.orden.total}`);
                 
                 // Limpiar formulario
                 limpiarCliente();
@@ -402,11 +403,11 @@
                 carrito = [];
                 actualizarCarrito();
             } else {
-                alert(`❌ Error: ${data.mensaje}`);
+                Notify.error(`❌ Error: ${data.mensaje}`);
             }
         } catch (error) {
             console.error('Error al completar venta:', error);
-            alert('Error al completar la venta');
+            Notify.error('Error al completar la venta');
         }
     });
 
@@ -419,9 +420,10 @@
                 document.getElementById('producto_search').value = '';
                 carrito = [];
                 actualizarCarrito();
+                Notify.info('Venta cancelada');
             }
         } else {
-            alert('No hay venta para cancelar');
+            Notify.warning('No hay venta para cancelar');
         }
     });
 </script>

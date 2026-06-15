@@ -41,7 +41,7 @@ class OrdenAPIView(View):
         return JsonResponse({
             "mensaje" : "Creado con exito",
             "orden: " : {
-                "cedula" : order.cliente_cedula,
+                "cedula" : order.cliente.cedula if order.cliente else None,
                 "precio_total" : order.precio_total,
                 "estado" : order.estado,
                 "metodo_pago" : order.metodo_pago,

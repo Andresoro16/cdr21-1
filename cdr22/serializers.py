@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Orden, OrdenItem
+from .models import Cliente, Orden, OrdenItem
 
 
 class OrdenItemSerializer(serializers.ModelSerializer):
@@ -19,10 +19,16 @@ class OrdenItemSerializer(serializers.ModelSerializer):
 
 class OrdenSerializer(serializers.ModelSerializer):
     items = OrdenItemSerializer(many=True, write_only=True)  # ← Nested validation
+    cliente_cedula = serializers.CharField(write_only=True)
     
     class Meta:
         model = Orden
         fields = ['metodo_pago', 'cliente_cedula', 'estado', 'items']
+
+    def validate_cliente_cedula(self, value):
+        if not Cliente.objects.filter(cedula=value).exists():
+            raise serializers.ValidationError("No existe un cliente con esta cédula")
+        return value
 
     def validate_metodo_pago(self, value):
         allowed_methods = ['efectivo', 'tarjeta', 'transferencia']
@@ -32,11 +38,14 @@ class OrdenSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Crear orden con items (transacción)"""
+        cliente_cedula = validated_data.pop('cliente_cedula')
         items_data = validated_data.pop('items')
+        cliente = Cliente.objects.get(cedula=cliente_cedula)
         total = 0
         for item in items_data:
             total += item['precio']
         validated_data['precio_total'] = total
+        validated_data['cliente'] = cliente
         orden = Orden.objects.create(**validated_data)
 
         for item_data in items_data:
@@ -45,7 +54,8 @@ class OrdenSerializer(serializers.ModelSerializer):
         return orden
 
 class OrdenReadSerializer(serializers.ModelSerializer):
-    # items = OrdenItemSerializer(many=true, writ)
+    cliente_cedula = serializers.CharField(source='cliente.cedula', read_only=True)
+
     class Meta:
         model = Orden
         fields = ['id', 'metodo_pago', 'precio_total', 'cliente_cedula', 'estado', 'created_at']
