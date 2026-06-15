@@ -18,6 +18,7 @@ urlpatterns =[
     path('dashboard/productos/eliminar/<int:producto_id>/', views.productos_eliminar, name='productos_eliminar'),
 
     path('dashboard/pos/', views.pos, name='pos'),
+    path('dashboard/ventas/', views.ventas_index, name='ventas_index'),
     path('dashboard/clientes/', views.clientes_index, name='clientes_index'),
     path('dashboard/clientes/crear/', views.clientes_crear, name='clientes_crear'),
     path('dashboard/clientes/editar/<int:cliente_id>/', views.clientes_editar, name='clientes_editar'),

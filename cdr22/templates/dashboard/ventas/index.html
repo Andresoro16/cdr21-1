@@ -1,0 +1,80 @@
+{% extends 'autenticado.html' %}
+{% load static %}
+
+{% block header_title %} Lista de Ventas {% endblock header_title %}
+
+{% block contenido %}
+<div class="dashboard-container">
+    {% include 'components/dashboard/page_header.html' with titulo="Lista de Ventas" descripcion="Consulte las ventas registradas desde el punto de venta" %}
+
+    <div class="flex justify-end mb-6">
+        <a href="{% url 'pos' %}" class="btn btn-md btn-success">
+            + Nueva Venta
+        </a>
+    </div>
+
+    <div class="data-table-wrapper-tall">
+        <table class="data-table">
+            <thead class="data-table-head">
+                <tr>
+                    <th class="table-header">Fecha</th>
+                    <th class="table-header">Factura</th>
+                    <th class="table-header">Cliente</th>
+                    <th class="table-header">Items</th>
+                    <th class="table-header">Método de pago</th>
+                    <th class="table-header">Total</th>
+                    <th class="table-header">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas.object_list %}
+                    <tr class="data-table-row">
+                        <td class="table-data">{{ venta.created_at|date:"Y-m-d H:i" }}</td>
+                        <td class="table-data font-mono">
+                            {% if venta.factura %}
+                                {{ venta.factura.numero }}
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-data">
+                            {% if venta.cliente %}
+                                <div class="font-medium">{{ venta.cliente.nombre }} {{ venta.cliente.apellidos }}</div>
+                                <div class="text-xs text-gray-500">{{ venta.cliente.cedula }}</div>
+                            {% else %}
+                                <span class="text-gray-400">Sin cliente</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-data">{{ venta.items.count }}</td>
+                        <td class="table-data">{{ venta.metodo_pago|default:"-" }}</td>
+                        <td class="table-data font-semibold text-green-600">${{ venta.precio_total }}</td>
+                        <td class="table-data">
+                            <span class="status-badge
+                                {% if venta.estado == 'completada' %}status-badge-success
+                                {% elif venta.estado == 'pendiente' %}status-badge-warning
+                                {% else %}status-badge-danger{% endif %}">
+                                {{ venta.get_estado_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-state-cell">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🧾</div>
+                                <p class="empty-state-title">No hay ventas registradas</p>
+                                <p class="empty-state-description">Las ventas completadas desde el punto de venta aparecerán aquí</p>
+                                <a href="{% url 'pos' %}" class="mt-4 btn btn-md btn-success">
+                                    + Crear Primera Venta
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'components/pagination.html' with pagina=ventas %}
+</div>
+{% endblock contenido %}

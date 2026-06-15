@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
-from cdr22.models import Producto, Categoria, Cliente, Compra, Proveedor
+from cdr22.models import Producto, Categoria, Cliente, Compra, Orden, Proveedor
 from cdr22.serializers import CompraCreateSerializer
 from cdr22.services.compras import CompraEstadoError, anular_compra, cambiar_estado_compra, crear_compra
 import json
@@ -196,6 +196,15 @@ def productos_eliminar(request, producto_id):
 @login_required(login_url='login')
 def pos(request):
     return render(request, 'dashboard/pos/index.html')
+
+@login_required(login_url='login')
+def ventas_index(request):
+    ventas_list = Orden.objects.select_related('cliente', 'factura').prefetch_related('items').all()
+    paginator = Paginator(ventas_list, 10)
+    page_number = request.GET.get('page')
+    ventas = paginator.get_page(page_number)
+
+    return render(request, 'dashboard/ventas/index.html', {'ventas': ventas})
 
 @login_required(login_url='login')
 def clientes_index(request):
