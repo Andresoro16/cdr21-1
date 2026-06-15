@@ -96,6 +96,11 @@
     <footer>
         <a href=""></a>
     </footer>
+    <script>
+        window.AppConfig = {
+            currency: '{{ configuracion_sistema.moneda|default:"COP"|escapejs }}'
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="{% static 'js/formatters.js' %}"></script>
     <script src="{% static 'js/notifications.js' %}"></script>

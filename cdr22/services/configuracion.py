@@ -8,6 +8,7 @@ def get_configuracion_sistema():
         pk=1,
         defaults={
             'siguiente_numero_factura': Factura.objects.count() + 1,
+            'moneda': 'COP',
         }
     )
     return configuracion
@@ -19,6 +20,7 @@ def generar_numero_factura():
             pk=1,
             defaults={
                 'siguiente_numero_factura': Factura.objects.count() + 1,
+                'moneda': 'COP',
             }
         )
 

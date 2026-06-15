@@ -45,8 +45,12 @@
 
             <div class="flex flex-col">
                 <label class="formulario_label mb-2" for="{{ form.moneda.id_for_label }}">Moneda *</label>
-                <input type="text" name="moneda" id="{{ form.moneda.id_for_label }}" value="{{ form.moneda.value|default:'' }}" class="formulario_input" required>
-                <p class="mt-2 text-sm text-gray-500">Ejemplo: COP.</p>
+                <select name="moneda" id="{{ form.moneda.id_for_label }}" class="formulario_input" required>
+                    {% for value, label in form.fields.moneda.choices %}
+                        <option value="{{ value }}" {% if form.moneda.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <p class="mt-2 text-sm text-gray-500">Por ahora el sistema solo maneja pesos colombianos.</p>
                 {% if form.moneda.errors %}<p class="mt-2 text-sm text-red-600">{{ form.moneda.errors.0 }}</p>{% endif %}
             </div>
         </div>

@@ -2,7 +2,7 @@ const Formatters = {
     money: (value, options = {}) => {
         const amount = Number(value || 0);
         const locale = options.locale || 'es-CO';
-        const currency = options.currency || 'COP';
+        const currency = options.currency || window.AppConfig?.currency || 'COP';
 
         return new Intl.NumberFormat(locale, {
             style: 'currency',

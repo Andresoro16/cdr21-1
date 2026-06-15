@@ -6,11 +6,15 @@ from django.utils import timezone
 # ============================================
 
 class ConfiguracionSistema(models.Model):
+    MONEDA_CHOICES = [
+        ('COP', 'COP - Peso colombiano'),
+    ]
+
     nombre_empresa = models.CharField(max_length=150, default='Las Motos')
     prefijo_factura = models.CharField(max_length=10, default='FAC')
     siguiente_numero_factura = models.PositiveIntegerField(default=1)
     impuesto_porcentaje = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    moneda = models.CharField(max_length=10, default='COP')
+    moneda = models.CharField(max_length=10, choices=MONEDA_CHOICES, default='COP')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
