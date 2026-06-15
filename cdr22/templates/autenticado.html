@@ -21,6 +21,7 @@
         <div class="auth_header max-w-7xl mx-auto ">
             <!-- Button Mobile -->
             <input type="checkbox" id="auth_menu-toggle" class="auth_menu_toggle">
+            <label for="auth_menu-toggle" class="auth_menu_overlay" aria-hidden="true"></label>
             <label for="auth_menu-toggle" class="auth_menu_button">
                 <div class="icon">
                     {% include "components/icons/menu_hamburguer.html" %}
@@ -88,7 +89,7 @@
             </div>
         </div>
     </header>
-    <main class="main_content max-w-7xl mx-auto py-4 md:py-8">
+    <main class="main_content py-4 md:py-8">
         {% block contenido %}
         {% endblock %}
     </main>
@@ -97,6 +98,16 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="{% static 'js/notifications.js' %}"></script>
+    <script>
+        document.querySelectorAll('.auth_nav a, .auth_nav button[type="submit"]').forEach((element) => {
+            element.addEventListener('click', () => {
+                const menuToggle = document.getElementById('auth_menu-toggle');
+                if (menuToggle) {
+                    menuToggle.checked = false;
+                }
+            });
+        });
+    </script>
     {% if messages %}
         <script>
             document.addEventListener('DOMContentLoaded', () => {

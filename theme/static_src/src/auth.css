@@ -8,9 +8,17 @@
     display: none;
   }
 
+  .auth_menu_overlay {
+    @apply hidden fixed inset-0 z-30 bg-black/40;
+  }
+
   /* Cuando el checkbox está marcado, mostramos el sidebar */
   .auth_menu_toggle:checked ~ .auth_nav {
     transform: translateX(0);
+  }
+
+  .auth_menu_toggle:checked ~ .auth_menu_overlay {
+    @apply block;
   }
 
   .auth_header .auth_icon,
@@ -31,7 +39,7 @@
   }
 
   .auth_nav {
-    @apply fixed top-0 left-0 flex flex-col p-4 bg-secondary text-secondary-foreground;
+    @apply fixed top-0 left-0 z-40 flex flex-col p-4 bg-secondary text-secondary-foreground;
     width: 240px;
     height: 100vh;
     color: #fff;
@@ -115,6 +123,7 @@
   @media (min-width: 768px) {
     .auth_nav {
       position: relative;
+      z-index: auto;
       height: 100%;
       width: max-content;
       background: transparent;
@@ -138,6 +147,10 @@
 
     .auth_menu_button {
       display: none;
+    }
+
+    .auth_menu_overlay {
+      display: none !important;
     }
   }
 
